@@ -1,0 +1,123 @@
+{
+  "runId": "run-TMzHIZ-XKY",
+  "status": "complete",
+  "trigger": "api",
+  "input": "USDOT 129916 — W J CASEY TRUCKING & RIGGING CO INC\nDBA: —\nPhysical address: BRANCHBURG, NJ 08876-3434\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 12   Power units: 13\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS: only 4 inspections, below the 5-inspection floor for ranking\nBASIC alerts: none\nCrashes 24mo: 0   Hazmat violations 24mo: 0",
+  "startedAt": 1790025680197,
+  "completedAt": 1790025690228,
+  "output": {
+    "qualified": [],
+    "adjacent": [],
+    "review": [
+      "USDOT 129916 is an active, for-hire intermodal carrier with 12 drivers/13 power units and no crashes, hazmat violations, or BASIC alerts. It passed drayage-operation, port-location, and fleet-size checks but failed risk-profile fit (0.22), mainly because SMS has only 4 inspections—below the 5-inspection ranking floor. Human question: Should a clean but thin safety record exclude it from drayage, or support manual inclusion?"
+    ]
+  },
+  "nodes": [
+    {
+      "nodeId": "input",
+      "nodeType": "input",
+      "label": "Carrier record",
+      "status": "complete",
+      "parentNodeIds": [],
+      "input": "USDOT 129916 — W J CASEY TRUCKING & RIGGING CO INC\nDBA: —\nPhysical address: BRANCHBURG, NJ 08876-3434\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 12   Power units: 13\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS: only 4 inspections, below the 5-inspection floor for ranking\nBASIC alerts: none\nCrashes 24mo: 0   Hazmat violations 24mo: 0",
+      "output": "USDOT 129916 — W J CASEY TRUCKING & RIGGING CO INC\nDBA: —\nPhysical address: BRANCHBURG, NJ 08876-3434\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 12   Power units: 13\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS: only 4 inspections, below the 5-inspection floor for ranking\nBASIC alerts: none\nCrashes 24mo: 0   Hazmat violations 24mo: 0",
+      "firedHandles": [
+        "out"
+      ],
+      "durationMs": 0,
+      "startedAt": 1790025680741
+    },
+    {
+      "nodeId": "jev-drayage",
+      "nodeType": "jev",
+      "label": "Drayage qualification",
+      "status": "complete",
+      "parentNodeIds": [
+        "input"
+      ],
+      "activation": "any",
+      "input": "USDOT 129916 — W J CASEY TRUCKING & RIGGING CO INC\nDBA: —\nPhysical address: BRANCHBURG, NJ 08876-3434\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 12   Power units: 13\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS: only 4 inspections, below the 5-inspection floor for ranking\nBASIC alerts: none\nCrashes 24mo: 0   Hazmat violations 24mo: 0",
+      "startedAt": 1790025681064,
+      "output": "USDOT 129916 — W J CASEY TRUCKING & RIGGING CO INC\nDBA: —\nPhysical address: BRANCHBURG, NJ 08876-3434\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 12   Power units: 13\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS: only 4 inspections, below the 5-inspection floor for ranking\nBASIC alerts: none\nCrashes 24mo: 0   Hazmat violations 24mo: 0",
+      "answers": {
+        "operation": {
+          "type": "choice",
+          "choice": "drayage_intermodal",
+          "confidence": 0.59,
+          "probabilities": {
+            "other_trucking": 0.31,
+            "not_a_carrier": 0,
+            "passenger_or_household": 0,
+            "drayage_intermodal": 0.69
+          }
+        },
+        "port_oriented": {
+          "type": "noul",
+          "noul": 0.84,
+          "threshold": 0.7
+        },
+        "size_profile": {
+          "type": "noul",
+          "noul": 0.84,
+          "threshold": 0.65
+        },
+        "risk_profile": {
+          "type": "noul",
+          "noul": 0.22,
+          "threshold": 0.6
+        }
+      },
+      "firedHandles": [
+        "any",
+        "q:operation:drayage_intermodal",
+        "q:port_oriented:yes",
+        "q:size_profile:yes",
+        "q:risk_profile:no"
+      ],
+      "mock": false,
+      "model": "jev-1.13.0",
+      "durationMs": 1283
+    },
+    {
+      "nodeId": "llm-review",
+      "nodeType": "llm",
+      "label": "Review note",
+      "status": "complete",
+      "parentNodeIds": [
+        "jev-drayage"
+      ],
+      "activation": "any",
+      "input": "USDOT 129916 — W J CASEY TRUCKING & RIGGING CO INC\nDBA: —\nPhysical address: BRANCHBURG, NJ 08876-3434\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 12   Power units: 13\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS: only 4 inspections, below the 5-inspection floor for ranking\nBASIC alerts: none\nCrashes 24mo: 0   Hazmat violations 24mo: 0",
+      "startedAt": 1790025682763,
+      "output": "USDOT 129916 is an active, for-hire intermodal carrier with 12 drivers/13 power units and no crashes, hazmat violations, or BASIC alerts. It passed drayage-operation, port-location, and fleet-size checks but failed risk-profile fit (0.22), mainly because SMS has only 4 inspections—below the 5-inspection ranking floor. Human question: Should a clean but thin safety record exclude it from drayage, or support manual inclusion?",
+      "firedHandles": [
+        "out"
+      ],
+      "mock": false,
+      "model": "deepseek-v4.1-flash",
+      "durationMs": 6765
+    },
+    {
+      "nodeId": "output",
+      "nodeType": "output",
+      "label": "Output",
+      "status": "complete",
+      "parentNodeIds": [
+        "llm-review"
+      ],
+      "activation": "any",
+      "input": "USDOT 129916 is an active, for-hire intermodal carrier with 12 drivers/13 power units and no crashes, hazmat violations, or BASIC alerts. It passed drayage-operation, port-location, and fleet-size checks but failed risk-profile fit (0.22), mainly because SMS has only 4 inspections—below the 5-inspection ranking floor. Human question: Should a clean but thin safety record exclude it from drayage, or support manual inclusion?",
+      "startedAt": 1790025689753,
+      "output": "USDOT 129916 is an active, for-hire intermodal carrier with 12 drivers/13 power units and no crashes, hazmat violations, or BASIC alerts. It passed drayage-operation, port-location, and fleet-size checks but failed risk-profile fit (0.22), mainly because SMS has only 4 inspections—below the 5-inspection ranking floor. Human question: Should a clean but thin safety record exclude it from drayage, or support manual inclusion?",
+      "outputs": {
+        "qualified": [],
+        "adjacent": [],
+        "review": [
+          "USDOT 129916 is an active, for-hire intermodal carrier with 12 drivers/13 power units and no crashes, hazmat violations, or BASIC alerts. It passed drayage-operation, port-location, and fleet-size checks but failed risk-profile fit (0.22), mainly because SMS has only 4 inspections—below the 5-inspection ranking floor. Human question: Should a clean but thin safety record exclude it from drayage, or support manual inclusion?"
+        ]
+      },
+      "firedHandles": [],
+      "durationMs": 228
+    }
+  ]
+}

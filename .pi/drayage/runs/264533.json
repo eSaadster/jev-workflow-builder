@@ -1,0 +1,123 @@
+{
+  "runId": "run-uZ6KLME7TU",
+  "status": "complete",
+  "trigger": "api",
+  "input": "USDOT 264533 — DE SANDRE BROS CO INC\nDBA: —\nPhysical address: CRANBURY, NJ 08512\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 5   Power units: 4\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS: only 0 inspections, below the 5-inspection floor for ranking\nBASIC alerts: none\nCrashes 24mo: 0   Hazmat violations 24mo: 0",
+  "startedAt": 1790025800363,
+  "completedAt": 1790025831578,
+  "output": {
+    "qualified": [],
+    "adjacent": [],
+    "review": [
+      "USDOT 264533 is an active Cranbury, NJ for-hire carrier with 4 power units, intermodal cargo authority, and no crash/hazmat history, but no SMS inspections. It passed operation, port-location, and fleet-size screens; it failed only risk-profile fit (0.17). Human question: Is that low score a genuine disqualifier, or just an artifact of too little inspection data?"
+    ]
+  },
+  "nodes": [
+    {
+      "nodeId": "input",
+      "nodeType": "input",
+      "label": "Carrier record",
+      "status": "complete",
+      "parentNodeIds": [],
+      "input": "USDOT 264533 — DE SANDRE BROS CO INC\nDBA: —\nPhysical address: CRANBURY, NJ 08512\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 5   Power units: 4\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS: only 0 inspections, below the 5-inspection floor for ranking\nBASIC alerts: none\nCrashes 24mo: 0   Hazmat violations 24mo: 0",
+      "output": "USDOT 264533 — DE SANDRE BROS CO INC\nDBA: —\nPhysical address: CRANBURY, NJ 08512\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 5   Power units: 4\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS: only 0 inspections, below the 5-inspection floor for ranking\nBASIC alerts: none\nCrashes 24mo: 0   Hazmat violations 24mo: 0",
+      "firedHandles": [
+        "out"
+      ],
+      "durationMs": 0,
+      "startedAt": 1790025800850
+    },
+    {
+      "nodeId": "jev-drayage",
+      "nodeType": "jev",
+      "label": "Drayage qualification",
+      "status": "complete",
+      "parentNodeIds": [
+        "input"
+      ],
+      "activation": "any",
+      "input": "USDOT 264533 — DE SANDRE BROS CO INC\nDBA: —\nPhysical address: CRANBURY, NJ 08512\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 5   Power units: 4\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS: only 0 inspections, below the 5-inspection floor for ranking\nBASIC alerts: none\nCrashes 24mo: 0   Hazmat violations 24mo: 0",
+      "startedAt": 1790025801174,
+      "output": "USDOT 264533 — DE SANDRE BROS CO INC\nDBA: —\nPhysical address: CRANBURY, NJ 08512\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 5   Power units: 4\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS: only 0 inspections, below the 5-inspection floor for ranking\nBASIC alerts: none\nCrashes 24mo: 0   Hazmat violations 24mo: 0",
+      "answers": {
+        "operation": {
+          "type": "choice",
+          "choice": "drayage_intermodal",
+          "confidence": 0.94,
+          "probabilities": {
+            "passenger_or_household": 0,
+            "drayage_intermodal": 0.96,
+            "not_a_carrier": 0,
+            "other_trucking": 0.04
+          }
+        },
+        "port_oriented": {
+          "type": "noul",
+          "noul": 0.74,
+          "threshold": 0.7
+        },
+        "size_profile": {
+          "type": "noul",
+          "noul": 0.81,
+          "threshold": 0.65
+        },
+        "risk_profile": {
+          "type": "noul",
+          "noul": 0.17,
+          "threshold": 0.6
+        }
+      },
+      "firedHandles": [
+        "any",
+        "q:operation:drayage_intermodal",
+        "q:port_oriented:yes",
+        "q:size_profile:yes",
+        "q:risk_profile:no"
+      ],
+      "mock": false,
+      "model": "jev-1.13.0",
+      "durationMs": 1723
+    },
+    {
+      "nodeId": "llm-review",
+      "nodeType": "llm",
+      "label": "Review note",
+      "status": "complete",
+      "parentNodeIds": [
+        "jev-drayage"
+      ],
+      "activation": "any",
+      "input": "USDOT 264533 — DE SANDRE BROS CO INC\nDBA: —\nPhysical address: CRANBURY, NJ 08512\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 5   Power units: 4\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS: only 0 inspections, below the 5-inspection floor for ranking\nBASIC alerts: none\nCrashes 24mo: 0   Hazmat violations 24mo: 0",
+      "startedAt": 1790025803889,
+      "output": "USDOT 264533 is an active Cranbury, NJ for-hire carrier with 4 power units, intermodal cargo authority, and no crash/hazmat history, but no SMS inspections. It passed operation, port-location, and fleet-size screens; it failed only risk-profile fit (0.17). Human question: Is that low score a genuine disqualifier, or just an artifact of too little inspection data?",
+      "firedHandles": [
+        "out"
+      ],
+      "mock": false,
+      "model": "deepseek-v4.1-flash",
+      "durationMs": 27042
+    },
+    {
+      "nodeId": "output",
+      "nodeType": "output",
+      "label": "Output",
+      "status": "complete",
+      "parentNodeIds": [
+        "llm-review"
+      ],
+      "activation": "any",
+      "input": "USDOT 264533 is an active Cranbury, NJ for-hire carrier with 4 power units, intermodal cargo authority, and no crash/hazmat history, but no SMS inspections. It passed operation, port-location, and fleet-size screens; it failed only risk-profile fit (0.17). Human question: Is that low score a genuine disqualifier, or just an artifact of too little inspection data?",
+      "startedAt": 1790025831147,
+      "output": "USDOT 264533 is an active Cranbury, NJ for-hire carrier with 4 power units, intermodal cargo authority, and no crash/hazmat history, but no SMS inspections. It passed operation, port-location, and fleet-size screens; it failed only risk-profile fit (0.17). Human question: Is that low score a genuine disqualifier, or just an artifact of too little inspection data?",
+      "outputs": {
+        "qualified": [],
+        "adjacent": [],
+        "review": [
+          "USDOT 264533 is an active Cranbury, NJ for-hire carrier with 4 power units, intermodal cargo authority, and no crash/hazmat history, but no SMS inspections. It passed operation, port-location, and fleet-size screens; it failed only risk-profile fit (0.17). Human question: Is that low score a genuine disqualifier, or just an artifact of too little inspection data?"
+        ]
+      },
+      "firedHandles": [],
+      "durationMs": 218
+    }
+  ]
+}

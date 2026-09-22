@@ -1,0 +1,123 @@
+{
+  "runId": "run-wgsyy-zFFj",
+  "status": "complete",
+  "trigger": "api",
+  "input": "USDOT 15059 — ROGERS SERVICE GROUP INC\nDBA: —\nPhysical address: BINGHAMTON, NY 13905-2128\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 15   Power units: 30\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS measures, with PortPro population rank (share of the peer population scored\nstrictly above; higher is worse):\n  unsafe_driv             0   rank 0\n  hos_driv                0   rank 0\n  veh_maint             .13   rank 8\n  driv_fit                0   rank 0\n  contr_subst             0   rank 0\nBASIC alerts: none\nCrashes 24mo: 0   Hazmat violations 24mo: 0",
+  "startedAt": 1790025618578,
+  "completedAt": 1790025625114,
+  "output": {
+    "qualified": [],
+    "adjacent": [],
+    "review": [
+      "USDOT 15059 (Rogers Service Group, Binghamton NY) is an active, satisfactory-rated for-hire carrier, 15 drivers/30 power units, intermodal cargo flag, clean SMS and crashes. Classified drayage_intermodal at 0.85, but failed the port-oriented location check (0.07) and fleet-size fit. Question: does it actually haul port drayage — e.g., to NY/NJ — from an inland Binghamton base, or is the intermodal flag unrelated to drayage?"
+    ]
+  },
+  "nodes": [
+    {
+      "nodeId": "input",
+      "nodeType": "input",
+      "label": "Carrier record",
+      "status": "complete",
+      "parentNodeIds": [],
+      "input": "USDOT 15059 — ROGERS SERVICE GROUP INC\nDBA: —\nPhysical address: BINGHAMTON, NY 13905-2128\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 15   Power units: 30\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS measures, with PortPro population rank (share of the peer population scored\nstrictly above; higher is worse):\n  unsafe_driv             0   rank 0\n  hos_driv                0   rank 0\n  veh_maint             .13   rank 8\n  driv_fit                0   rank 0\n  contr_subst             0   rank 0\nBASIC alerts: none\nCrashes 24mo: 0   Hazmat violations 24mo: 0",
+      "output": "USDOT 15059 — ROGERS SERVICE GROUP INC\nDBA: —\nPhysical address: BINGHAMTON, NY 13905-2128\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 15   Power units: 30\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS measures, with PortPro population rank (share of the peer population scored\nstrictly above; higher is worse):\n  unsafe_driv             0   rank 0\n  hos_driv                0   rank 0\n  veh_maint             .13   rank 8\n  driv_fit                0   rank 0\n  contr_subst             0   rank 0\nBASIC alerts: none\nCrashes 24mo: 0   Hazmat violations 24mo: 0",
+      "firedHandles": [
+        "out"
+      ],
+      "durationMs": 0,
+      "startedAt": 1790025619146
+    },
+    {
+      "nodeId": "jev-drayage",
+      "nodeType": "jev",
+      "label": "Drayage qualification",
+      "status": "complete",
+      "parentNodeIds": [
+        "input"
+      ],
+      "activation": "any",
+      "input": "USDOT 15059 — ROGERS SERVICE GROUP INC\nDBA: —\nPhysical address: BINGHAMTON, NY 13905-2128\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 15   Power units: 30\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS measures, with PortPro population rank (share of the peer population scored\nstrictly above; higher is worse):\n  unsafe_driv             0   rank 0\n  hos_driv                0   rank 0\n  veh_maint             .13   rank 8\n  driv_fit                0   rank 0\n  contr_subst             0   rank 0\nBASIC alerts: none\nCrashes 24mo: 0   Hazmat violations 24mo: 0",
+      "startedAt": 1790025619775,
+      "output": "USDOT 15059 — ROGERS SERVICE GROUP INC\nDBA: —\nPhysical address: BINGHAMTON, NY 13905-2128\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 15   Power units: 30\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS measures, with PortPro population rank (share of the peer population scored\nstrictly above; higher is worse):\n  unsafe_driv             0   rank 0\n  hos_driv                0   rank 0\n  veh_maint             .13   rank 8\n  driv_fit                0   rank 0\n  contr_subst             0   rank 0\nBASIC alerts: none\nCrashes 24mo: 0   Hazmat violations 24mo: 0",
+      "answers": {
+        "operation": {
+          "type": "choice",
+          "choice": "drayage_intermodal",
+          "confidence": 0.8,
+          "probabilities": {
+            "other_trucking": 0.15,
+            "drayage_intermodal": 0.85,
+            "not_a_carrier": 0,
+            "passenger_or_household": 0
+          }
+        },
+        "port_oriented": {
+          "type": "noul",
+          "noul": 0.07,
+          "threshold": 0.7
+        },
+        "size_profile": {
+          "type": "noul",
+          "noul": 0.48,
+          "threshold": 0.65
+        },
+        "risk_profile": {
+          "type": "noul",
+          "noul": 0.16,
+          "threshold": 0.6
+        }
+      },
+      "firedHandles": [
+        "any",
+        "q:operation:drayage_intermodal",
+        "q:port_oriented:no",
+        "q:size_profile:no",
+        "q:risk_profile:no"
+      ],
+      "mock": false,
+      "model": "jev-1.13.0",
+      "durationMs": 1232
+    },
+    {
+      "nodeId": "llm-review",
+      "nodeType": "llm",
+      "label": "Review note",
+      "status": "complete",
+      "parentNodeIds": [
+        "jev-drayage"
+      ],
+      "activation": "any",
+      "input": "USDOT 15059 — ROGERS SERVICE GROUP INC\nDBA: —\nPhysical address: BINGHAMTON, NY 13905-2128\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 15   Power units: 30\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS measures, with PortPro population rank (share of the peer population scored\nstrictly above; higher is worse):\n  unsafe_driv             0   rank 0\n  hos_driv                0   rank 0\n  veh_maint             .13   rank 8\n  driv_fit                0   rank 0\n  contr_subst             0   rank 0\nBASIC alerts: none\nCrashes 24mo: 0   Hazmat violations 24mo: 0",
+      "startedAt": 1790025621252,
+      "output": "USDOT 15059 (Rogers Service Group, Binghamton NY) is an active, satisfactory-rated for-hire carrier, 15 drivers/30 power units, intermodal cargo flag, clean SMS and crashes. Classified drayage_intermodal at 0.85, but failed the port-oriented location check (0.07) and fleet-size fit. Question: does it actually haul port drayage — e.g., to NY/NJ — from an inland Binghamton base, or is the intermodal flag unrelated to drayage?",
+      "firedHandles": [
+        "out"
+      ],
+      "mock": false,
+      "model": "deepseek-v4.1-flash",
+      "durationMs": 3192
+    },
+    {
+      "nodeId": "output",
+      "nodeType": "output",
+      "label": "Output",
+      "status": "complete",
+      "parentNodeIds": [
+        "llm-review"
+      ],
+      "activation": "any",
+      "input": "USDOT 15059 (Rogers Service Group, Binghamton NY) is an active, satisfactory-rated for-hire carrier, 15 drivers/30 power units, intermodal cargo flag, clean SMS and crashes. Classified drayage_intermodal at 0.85, but failed the port-oriented location check (0.07) and fleet-size fit. Question: does it actually haul port drayage — e.g., to NY/NJ — from an inland Binghamton base, or is the intermodal flag unrelated to drayage?",
+      "startedAt": 1790025624661,
+      "output": "USDOT 15059 (Rogers Service Group, Binghamton NY) is an active, satisfactory-rated for-hire carrier, 15 drivers/30 power units, intermodal cargo flag, clean SMS and crashes. Classified drayage_intermodal at 0.85, but failed the port-oriented location check (0.07) and fleet-size fit. Question: does it actually haul port drayage — e.g., to NY/NJ — from an inland Binghamton base, or is the intermodal flag unrelated to drayage?",
+      "outputs": {
+        "qualified": [],
+        "adjacent": [],
+        "review": [
+          "USDOT 15059 (Rogers Service Group, Binghamton NY) is an active, satisfactory-rated for-hire carrier, 15 drivers/30 power units, intermodal cargo flag, clean SMS and crashes. Classified drayage_intermodal at 0.85, but failed the port-oriented location check (0.07) and fleet-size fit. Question: does it actually haul port drayage — e.g., to NY/NJ — from an inland Binghamton base, or is the intermodal flag unrelated to drayage?"
+        ]
+      },
+      "firedHandles": [],
+      "durationMs": 228
+    }
+  ]
+}

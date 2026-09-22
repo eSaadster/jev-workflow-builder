@@ -1,0 +1,123 @@
+{
+  "runId": "run-SIfHa4A6sG",
+  "status": "complete",
+  "trigger": "api",
+  "input": "USDOT 282082 — HILLSIDE WAREHOUSE AND TRUCKING CO INC\nDBA: —\nPhysical address: EDISON, NJ 08837\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 19   Power units: 19\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS: only 3 inspections, below the 5-inspection floor for ranking\nBASIC alerts: none\nCrashes 24mo: 0   Hazmat violations 24mo: 0",
+  "startedAt": 1790025908964,
+  "completedAt": 1790025918257,
+  "output": {
+    "qualified": [],
+    "adjacent": [],
+    "review": [
+      "HILLSIDE WAREHOUSE AND TRUCKING CO INC (USDOT 282082) is an active, authorized-for-hire intermodal drayage carrier: 19 drivers/19 power units, Edison NJ, intermodal cargo flag, clean 24-month record (0 crashes, 0 hazmat violations, no BASIC alerts). It passed operation, port location, and fleet-size checks; it failed only risk-profile fit (0.22) because SMS has just 3 inspections — below the ranking floor.\n\nQuestion: is that 0.22 a real risk signal, or an artifact of unrankable data?"
+    ]
+  },
+  "nodes": [
+    {
+      "nodeId": "input",
+      "nodeType": "input",
+      "label": "Carrier record",
+      "status": "complete",
+      "parentNodeIds": [],
+      "input": "USDOT 282082 — HILLSIDE WAREHOUSE AND TRUCKING CO INC\nDBA: —\nPhysical address: EDISON, NJ 08837\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 19   Power units: 19\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS: only 3 inspections, below the 5-inspection floor for ranking\nBASIC alerts: none\nCrashes 24mo: 0   Hazmat violations 24mo: 0",
+      "output": "USDOT 282082 — HILLSIDE WAREHOUSE AND TRUCKING CO INC\nDBA: —\nPhysical address: EDISON, NJ 08837\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 19   Power units: 19\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS: only 3 inspections, below the 5-inspection floor for ranking\nBASIC alerts: none\nCrashes 24mo: 0   Hazmat violations 24mo: 0",
+      "firedHandles": [
+        "out"
+      ],
+      "durationMs": 0,
+      "startedAt": 1790025909463
+    },
+    {
+      "nodeId": "jev-drayage",
+      "nodeType": "jev",
+      "label": "Drayage qualification",
+      "status": "complete",
+      "parentNodeIds": [
+        "input"
+      ],
+      "activation": "any",
+      "input": "USDOT 282082 — HILLSIDE WAREHOUSE AND TRUCKING CO INC\nDBA: —\nPhysical address: EDISON, NJ 08837\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 19   Power units: 19\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS: only 3 inspections, below the 5-inspection floor for ranking\nBASIC alerts: none\nCrashes 24mo: 0   Hazmat violations 24mo: 0",
+      "startedAt": 1790025910630,
+      "output": "USDOT 282082 — HILLSIDE WAREHOUSE AND TRUCKING CO INC\nDBA: —\nPhysical address: EDISON, NJ 08837\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 19   Power units: 19\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS: only 3 inspections, below the 5-inspection floor for ranking\nBASIC alerts: none\nCrashes 24mo: 0   Hazmat violations 24mo: 0",
+      "answers": {
+        "operation": {
+          "type": "choice",
+          "choice": "drayage_intermodal",
+          "confidence": 0.82,
+          "probabilities": {
+            "passenger_or_household": 0,
+            "not_a_carrier": 0,
+            "drayage_intermodal": 0.86,
+            "other_trucking": 0.14
+          }
+        },
+        "port_oriented": {
+          "type": "noul",
+          "noul": 0.93,
+          "threshold": 0.7
+        },
+        "size_profile": {
+          "type": "noul",
+          "noul": 0.84,
+          "threshold": 0.65
+        },
+        "risk_profile": {
+          "type": "noul",
+          "noul": 0.22,
+          "threshold": 0.6
+        }
+      },
+      "firedHandles": [
+        "any",
+        "q:operation:drayage_intermodal",
+        "q:port_oriented:yes",
+        "q:size_profile:yes",
+        "q:risk_profile:no"
+      ],
+      "mock": false,
+      "model": "jev-1.13.0",
+      "durationMs": 1362
+    },
+    {
+      "nodeId": "llm-review",
+      "nodeType": "llm",
+      "label": "Review note",
+      "status": "complete",
+      "parentNodeIds": [
+        "jev-drayage"
+      ],
+      "activation": "any",
+      "input": "USDOT 282082 — HILLSIDE WAREHOUSE AND TRUCKING CO INC\nDBA: —\nPhysical address: EDISON, NJ 08837\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 19   Power units: 19\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS: only 3 inspections, below the 5-inspection floor for ranking\nBASIC alerts: none\nCrashes 24mo: 0   Hazmat violations 24mo: 0",
+      "startedAt": 1790025912225,
+      "output": "HILLSIDE WAREHOUSE AND TRUCKING CO INC (USDOT 282082) is an active, authorized-for-hire intermodal drayage carrier: 19 drivers/19 power units, Edison NJ, intermodal cargo flag, clean 24-month record (0 crashes, 0 hazmat violations, no BASIC alerts). It passed operation, port location, and fleet-size checks; it failed only risk-profile fit (0.22) because SMS has just 3 inspections — below the ranking floor.\n\nQuestion: is that 0.22 a real risk signal, or an artifact of unrankable data?",
+      "firedHandles": [
+        "out"
+      ],
+      "mock": false,
+      "model": "deepseek-v4.1-flash",
+      "durationMs": 4863
+    },
+    {
+      "nodeId": "output",
+      "nodeType": "output",
+      "label": "Output",
+      "status": "complete",
+      "parentNodeIds": [
+        "llm-review"
+      ],
+      "activation": "any",
+      "input": "HILLSIDE WAREHOUSE AND TRUCKING CO INC (USDOT 282082) is an active, authorized-for-hire intermodal drayage carrier: 19 drivers/19 power units, Edison NJ, intermodal cargo flag, clean 24-month record (0 crashes, 0 hazmat violations, no BASIC alerts). It passed operation, port location, and fleet-size checks; it failed only risk-profile fit (0.22) because SMS has just 3 inspections — below the ranking floor.\n\nQuestion: is that 0.22 a real risk signal, or an artifact of unrankable data?",
+      "startedAt": 1790025917309,
+      "output": "HILLSIDE WAREHOUSE AND TRUCKING CO INC (USDOT 282082) is an active, authorized-for-hire intermodal drayage carrier: 19 drivers/19 power units, Edison NJ, intermodal cargo flag, clean 24-month record (0 crashes, 0 hazmat violations, no BASIC alerts). It passed operation, port location, and fleet-size checks; it failed only risk-profile fit (0.22) because SMS has just 3 inspections — below the ranking floor.\n\nQuestion: is that 0.22 a real risk signal, or an artifact of unrankable data?",
+      "outputs": {
+        "qualified": [],
+        "adjacent": [],
+        "review": [
+          "HILLSIDE WAREHOUSE AND TRUCKING CO INC (USDOT 282082) is an active, authorized-for-hire intermodal drayage carrier: 19 drivers/19 power units, Edison NJ, intermodal cargo flag, clean 24-month record (0 crashes, 0 hazmat violations, no BASIC alerts). It passed operation, port location, and fleet-size checks; it failed only risk-profile fit (0.22) because SMS has just 3 inspections — below the ranking floor.\n\nQuestion: is that 0.22 a real risk signal, or an artifact of unrankable data?"
+        ]
+      },
+      "firedHandles": [],
+      "durationMs": 707
+    }
+  ]
+}

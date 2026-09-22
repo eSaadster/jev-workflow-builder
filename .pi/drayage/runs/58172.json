@@ -1,0 +1,123 @@
+{
+  "runId": "run-GOG87AdlUd",
+  "status": "complete",
+  "trigger": "api",
+  "input": "USDOT 58172 — GLENERY INC\nDBA: —\nPhysical address: KEARNY, NJ 07032-4228\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 6   Power units: 6\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS: only 3 inspections, below the 5-inspection floor for ranking\nBASIC alerts: none\nCrashes 24mo: 0   Hazmat violations 24mo: 0",
+  "startedAt": 1790025670440,
+  "completedAt": 1790025679388,
+  "output": {
+    "qualified": [],
+    "adjacent": [],
+    "review": [
+      "GLENERY INC is an active, authorized-for-hire, 6-truck intermodal carrier in Kearny, NJ. It passes operation, port-location, and fleet-size checks; it fails risk-profile fit at 0.23. SMS is unrankable with only 3 inspections, though crashes/BASIC are clean. Human question: Does low risk fit plus insufficient SMS data justify exclusion, or does clean crash/BASIC history warrant manual inclusion?"
+    ]
+  },
+  "nodes": [
+    {
+      "nodeId": "input",
+      "nodeType": "input",
+      "label": "Carrier record",
+      "status": "complete",
+      "parentNodeIds": [],
+      "input": "USDOT 58172 — GLENERY INC\nDBA: —\nPhysical address: KEARNY, NJ 07032-4228\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 6   Power units: 6\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS: only 3 inspections, below the 5-inspection floor for ranking\nBASIC alerts: none\nCrashes 24mo: 0   Hazmat violations 24mo: 0",
+      "output": "USDOT 58172 — GLENERY INC\nDBA: —\nPhysical address: KEARNY, NJ 07032-4228\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 6   Power units: 6\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS: only 3 inspections, below the 5-inspection floor for ranking\nBASIC alerts: none\nCrashes 24mo: 0   Hazmat violations 24mo: 0",
+      "firedHandles": [
+        "out"
+      ],
+      "durationMs": 0,
+      "startedAt": 1790025670939
+    },
+    {
+      "nodeId": "jev-drayage",
+      "nodeType": "jev",
+      "label": "Drayage qualification",
+      "status": "complete",
+      "parentNodeIds": [
+        "input"
+      ],
+      "activation": "any",
+      "input": "USDOT 58172 — GLENERY INC\nDBA: —\nPhysical address: KEARNY, NJ 07032-4228\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 6   Power units: 6\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS: only 3 inspections, below the 5-inspection floor for ranking\nBASIC alerts: none\nCrashes 24mo: 0   Hazmat violations 24mo: 0",
+      "startedAt": 1790025671264,
+      "output": "USDOT 58172 — GLENERY INC\nDBA: —\nPhysical address: KEARNY, NJ 07032-4228\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 6   Power units: 6\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS: only 3 inspections, below the 5-inspection floor for ranking\nBASIC alerts: none\nCrashes 24mo: 0   Hazmat violations 24mo: 0",
+      "answers": {
+        "operation": {
+          "type": "choice",
+          "choice": "drayage_intermodal",
+          "confidence": 0.96,
+          "probabilities": {
+            "not_a_carrier": 0,
+            "other_trucking": 0.03,
+            "passenger_or_household": 0,
+            "drayage_intermodal": 0.97
+          }
+        },
+        "port_oriented": {
+          "type": "noul",
+          "noul": 0.97,
+          "threshold": 0.7
+        },
+        "size_profile": {
+          "type": "noul",
+          "noul": 0.85,
+          "threshold": 0.65
+        },
+        "risk_profile": {
+          "type": "noul",
+          "noul": 0.23,
+          "threshold": 0.6
+        }
+      },
+      "firedHandles": [
+        "any",
+        "q:operation:drayage_intermodal",
+        "q:port_oriented:yes",
+        "q:size_profile:yes",
+        "q:risk_profile:no"
+      ],
+      "mock": false,
+      "model": "jev-1.13.0",
+      "durationMs": 1279
+    },
+    {
+      "nodeId": "llm-review",
+      "nodeType": "llm",
+      "label": "Review note",
+      "status": "complete",
+      "parentNodeIds": [
+        "jev-drayage"
+      ],
+      "activation": "any",
+      "input": "USDOT 58172 — GLENERY INC\nDBA: —\nPhysical address: KEARNY, NJ 07032-4228\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 6   Power units: 6\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS: only 3 inspections, below the 5-inspection floor for ranking\nBASIC alerts: none\nCrashes 24mo: 0   Hazmat violations 24mo: 0",
+      "startedAt": 1790025672883,
+      "output": "GLENERY INC is an active, authorized-for-hire, 6-truck intermodal carrier in Kearny, NJ. It passes operation, port-location, and fleet-size checks; it fails risk-profile fit at 0.23. SMS is unrankable with only 3 inspections, though crashes/BASIC are clean. Human question: Does low risk fit plus insufficient SMS data justify exclusion, or does clean crash/BASIC history warrant manual inclusion?",
+      "firedHandles": [
+        "out"
+      ],
+      "mock": false,
+      "model": "deepseek-v4.1-flash",
+      "durationMs": 5723
+    },
+    {
+      "nodeId": "output",
+      "nodeType": "output",
+      "label": "Output",
+      "status": "complete",
+      "parentNodeIds": [
+        "llm-review"
+      ],
+      "activation": "any",
+      "input": "GLENERY INC is an active, authorized-for-hire, 6-truck intermodal carrier in Kearny, NJ. It passes operation, port-location, and fleet-size checks; it fails risk-profile fit at 0.23. SMS is unrankable with only 3 inspections, though crashes/BASIC are clean. Human question: Does low risk fit plus insufficient SMS data justify exclusion, or does clean crash/BASIC history warrant manual inclusion?",
+      "startedAt": 1790025678839,
+      "output": "GLENERY INC is an active, authorized-for-hire, 6-truck intermodal carrier in Kearny, NJ. It passes operation, port-location, and fleet-size checks; it fails risk-profile fit at 0.23. SMS is unrankable with only 3 inspections, though crashes/BASIC are clean. Human question: Does low risk fit plus insufficient SMS data justify exclusion, or does clean crash/BASIC history warrant manual inclusion?",
+      "outputs": {
+        "qualified": [],
+        "adjacent": [],
+        "review": [
+          "GLENERY INC is an active, authorized-for-hire, 6-truck intermodal carrier in Kearny, NJ. It passes operation, port-location, and fleet-size checks; it fails risk-profile fit at 0.23. SMS is unrankable with only 3 inspections, though crashes/BASIC are clean. Human question: Does low risk fit plus insufficient SMS data justify exclusion, or does clean crash/BASIC history warrant manual inclusion?"
+        ]
+      },
+      "firedHandles": [],
+      "durationMs": 239
+    }
+  ]
+}

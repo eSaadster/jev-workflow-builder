@@ -1,0 +1,123 @@
+{
+  "runId": "run-_jZ10G7Pgt",
+  "status": "complete",
+  "trigger": "api",
+  "input": "USDOT 388343 — MIKE VAN ELSWYK TRUCKING INCORPORATED\nDBA: MVT ENVIRONMENTAL SERVICES\nPhysical address: ELIZABETH, NJ 07201\nClassdef: PRIVATE PROPERTY;AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 12   Power units: 12\nCargo flags: crgo_intermodal\nSafety rating: C\nSMS measures, with PortPro population rank (share of the peer population scored\nstrictly above; higher is worse):\n  unsafe_driv             0   rank 0\n  hos_driv                0   rank 0\n  veh_maint           13.55   rank 88\n  driv_fit              .83   rank 81\n  contr_subst             0   rank 0\nBASIC alerts: none\nCrashes 24mo: 3   Hazmat violations 24mo: 0",
+  "startedAt": 1790026024232,
+  "completedAt": 1790026035047,
+  "output": {
+    "qualified": [],
+    "adjacent": [],
+    "review": [
+      "DOT 388343 (MVT Environmental Services, Elizabeth NJ) is a 12-truck active intermodal drayage carrier with for-hire authority. It fails the risk screen, not the operating profile: safety rating C, vehicle maintenance 13.55 (rank 88), driver fitness rank 81, three crashes in 24 months. Question for reviewer: does that C rating and crash count disqualify it despite the strong drayage fit?"
+    ]
+  },
+  "nodes": [
+    {
+      "nodeId": "input",
+      "nodeType": "input",
+      "label": "Carrier record",
+      "status": "complete",
+      "parentNodeIds": [],
+      "input": "USDOT 388343 — MIKE VAN ELSWYK TRUCKING INCORPORATED\nDBA: MVT ENVIRONMENTAL SERVICES\nPhysical address: ELIZABETH, NJ 07201\nClassdef: PRIVATE PROPERTY;AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 12   Power units: 12\nCargo flags: crgo_intermodal\nSafety rating: C\nSMS measures, with PortPro population rank (share of the peer population scored\nstrictly above; higher is worse):\n  unsafe_driv             0   rank 0\n  hos_driv                0   rank 0\n  veh_maint           13.55   rank 88\n  driv_fit              .83   rank 81\n  contr_subst             0   rank 0\nBASIC alerts: none\nCrashes 24mo: 3   Hazmat violations 24mo: 0",
+      "output": "USDOT 388343 — MIKE VAN ELSWYK TRUCKING INCORPORATED\nDBA: MVT ENVIRONMENTAL SERVICES\nPhysical address: ELIZABETH, NJ 07201\nClassdef: PRIVATE PROPERTY;AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 12   Power units: 12\nCargo flags: crgo_intermodal\nSafety rating: C\nSMS measures, with PortPro population rank (share of the peer population scored\nstrictly above; higher is worse):\n  unsafe_driv             0   rank 0\n  hos_driv                0   rank 0\n  veh_maint           13.55   rank 88\n  driv_fit              .83   rank 81\n  contr_subst             0   rank 0\nBASIC alerts: none\nCrashes 24mo: 3   Hazmat violations 24mo: 0",
+      "firedHandles": [
+        "out"
+      ],
+      "durationMs": 0,
+      "startedAt": 1790026024732
+    },
+    {
+      "nodeId": "jev-drayage",
+      "nodeType": "jev",
+      "label": "Drayage qualification",
+      "status": "complete",
+      "parentNodeIds": [
+        "input"
+      ],
+      "activation": "any",
+      "input": "USDOT 388343 — MIKE VAN ELSWYK TRUCKING INCORPORATED\nDBA: MVT ENVIRONMENTAL SERVICES\nPhysical address: ELIZABETH, NJ 07201\nClassdef: PRIVATE PROPERTY;AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 12   Power units: 12\nCargo flags: crgo_intermodal\nSafety rating: C\nSMS measures, with PortPro population rank (share of the peer population scored\nstrictly above; higher is worse):\n  unsafe_driv             0   rank 0\n  hos_driv                0   rank 0\n  veh_maint           13.55   rank 88\n  driv_fit              .83   rank 81\n  contr_subst             0   rank 0\nBASIC alerts: none\nCrashes 24mo: 3   Hazmat violations 24mo: 0",
+      "startedAt": 1790026025040,
+      "output": "USDOT 388343 — MIKE VAN ELSWYK TRUCKING INCORPORATED\nDBA: MVT ENVIRONMENTAL SERVICES\nPhysical address: ELIZABETH, NJ 07201\nClassdef: PRIVATE PROPERTY;AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 12   Power units: 12\nCargo flags: crgo_intermodal\nSafety rating: C\nSMS measures, with PortPro population rank (share of the peer population scored\nstrictly above; higher is worse):\n  unsafe_driv             0   rank 0\n  hos_driv                0   rank 0\n  veh_maint           13.55   rank 88\n  driv_fit              .83   rank 81\n  contr_subst             0   rank 0\nBASIC alerts: none\nCrashes 24mo: 3   Hazmat violations 24mo: 0",
+      "answers": {
+        "operation": {
+          "type": "choice",
+          "choice": "drayage_intermodal",
+          "confidence": 0.93,
+          "probabilities": {
+            "passenger_or_household": 0,
+            "not_a_carrier": 0,
+            "other_trucking": 0.05,
+            "drayage_intermodal": 0.95
+          }
+        },
+        "port_oriented": {
+          "type": "noul",
+          "noul": 0.98,
+          "threshold": 0.7
+        },
+        "size_profile": {
+          "type": "noul",
+          "noul": 0.89,
+          "threshold": 0.65
+        },
+        "risk_profile": {
+          "type": "noul",
+          "noul": 0.47,
+          "threshold": 0.6
+        }
+      },
+      "firedHandles": [
+        "any",
+        "q:operation:drayage_intermodal",
+        "q:port_oriented:yes",
+        "q:size_profile:yes",
+        "q:risk_profile:no"
+      ],
+      "mock": false,
+      "model": "jev-1.13.0",
+      "durationMs": 1571
+    },
+    {
+      "nodeId": "llm-review",
+      "nodeType": "llm",
+      "label": "Review note",
+      "status": "complete",
+      "parentNodeIds": [
+        "jev-drayage"
+      ],
+      "activation": "any",
+      "input": "USDOT 388343 — MIKE VAN ELSWYK TRUCKING INCORPORATED\nDBA: MVT ENVIRONMENTAL SERVICES\nPhysical address: ELIZABETH, NJ 07201\nClassdef: PRIVATE PROPERTY;AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 12   Power units: 12\nCargo flags: crgo_intermodal\nSafety rating: C\nSMS measures, with PortPro population rank (share of the peer population scored\nstrictly above; higher is worse):\n  unsafe_driv             0   rank 0\n  hos_driv                0   rank 0\n  veh_maint           13.55   rank 88\n  driv_fit              .83   rank 81\n  contr_subst             0   rank 0\nBASIC alerts: none\nCrashes 24mo: 3   Hazmat violations 24mo: 0",
+      "startedAt": 1790026027634,
+      "output": "DOT 388343 (MVT Environmental Services, Elizabeth NJ) is a 12-truck active intermodal drayage carrier with for-hire authority. It fails the risk screen, not the operating profile: safety rating C, vehicle maintenance 13.55 (rank 88), driver fitness rank 81, three crashes in 24 months. Question for reviewer: does that C rating and crash count disqualify it despite the strong drayage fit?",
+      "firedHandles": [
+        "out"
+      ],
+      "mock": false,
+      "model": "deepseek-v4.1-flash",
+      "durationMs": 6769
+    },
+    {
+      "nodeId": "output",
+      "nodeType": "output",
+      "label": "Output",
+      "status": "complete",
+      "parentNodeIds": [
+        "llm-review"
+      ],
+      "activation": "any",
+      "input": "DOT 388343 (MVT Environmental Services, Elizabeth NJ) is a 12-truck active intermodal drayage carrier with for-hire authority. It fails the risk screen, not the operating profile: safety rating C, vehicle maintenance 13.55 (rank 88), driver fitness rank 81, three crashes in 24 months. Question for reviewer: does that C rating and crash count disqualify it despite the strong drayage fit?",
+      "startedAt": 1790026034615,
+      "output": "DOT 388343 (MVT Environmental Services, Elizabeth NJ) is a 12-truck active intermodal drayage carrier with for-hire authority. It fails the risk screen, not the operating profile: safety rating C, vehicle maintenance 13.55 (rank 88), driver fitness rank 81, three crashes in 24 months. Question for reviewer: does that C rating and crash count disqualify it despite the strong drayage fit?",
+      "outputs": {
+        "qualified": [],
+        "adjacent": [],
+        "review": [
+          "DOT 388343 (MVT Environmental Services, Elizabeth NJ) is a 12-truck active intermodal drayage carrier with for-hire authority. It fails the risk screen, not the operating profile: safety rating C, vehicle maintenance 13.55 (rank 88), driver fitness rank 81, three crashes in 24 months. Question for reviewer: does that C rating and crash count disqualify it despite the strong drayage fit?"
+        ]
+      },
+      "firedHandles": [],
+      "durationMs": 216
+    }
+  ]
+}

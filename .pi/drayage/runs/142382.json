@@ -1,0 +1,123 @@
+{
+  "runId": "run-R_x97BI_Q8",
+  "status": "complete",
+  "trigger": "api",
+  "input": "USDOT 142382 — COPEBESTWAY EXPRESS INC\nDBA: —\nPhysical address: CHEEKTOWAGA, NY 14212\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 17   Power units: 19\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS measures, with PortPro population rank (share of the peer population scored\nstrictly above; higher is worse):\n  unsafe_driv             0   rank 0\n  hos_driv                0   rank 0\n  veh_maint            4.84   rank 48\n  driv_fit                0   rank 0\n  contr_subst             0   rank 0\nBASIC alerts: none\nCrashes 24mo: 0   Hazmat violations 24mo: 0",
+  "startedAt": 1790025706538,
+  "completedAt": 1790025714722,
+  "output": {
+    "qualified": [],
+    "adjacent": [],
+    "review": [
+      "USDOT 142382 COPEBESTWAY EXPRESS INC — active, for-hire, 17 drivers/19 power units, intermodal cargo flag, based Cheektowaga NY (Buffalo area). Passes fleet-size and risk-profile checks; fails port orientation (0.38, no port metro). Only flag is veh_maint 4.84 (48th pct); no crashes, no BASIC alerts. Ask: does it truly dray to/from a port, or is that flag rail/intermodal-only?"
+    ]
+  },
+  "nodes": [
+    {
+      "nodeId": "input",
+      "nodeType": "input",
+      "label": "Carrier record",
+      "status": "complete",
+      "parentNodeIds": [],
+      "input": "USDOT 142382 — COPEBESTWAY EXPRESS INC\nDBA: —\nPhysical address: CHEEKTOWAGA, NY 14212\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 17   Power units: 19\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS measures, with PortPro population rank (share of the peer population scored\nstrictly above; higher is worse):\n  unsafe_driv             0   rank 0\n  hos_driv                0   rank 0\n  veh_maint            4.84   rank 48\n  driv_fit                0   rank 0\n  contr_subst             0   rank 0\nBASIC alerts: none\nCrashes 24mo: 0   Hazmat violations 24mo: 0",
+      "output": "USDOT 142382 — COPEBESTWAY EXPRESS INC\nDBA: —\nPhysical address: CHEEKTOWAGA, NY 14212\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 17   Power units: 19\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS measures, with PortPro population rank (share of the peer population scored\nstrictly above; higher is worse):\n  unsafe_driv             0   rank 0\n  hos_driv                0   rank 0\n  veh_maint            4.84   rank 48\n  driv_fit                0   rank 0\n  contr_subst             0   rank 0\nBASIC alerts: none\nCrashes 24mo: 0   Hazmat violations 24mo: 0",
+      "firedHandles": [
+        "out"
+      ],
+      "durationMs": 0,
+      "startedAt": 1790025707111
+    },
+    {
+      "nodeId": "jev-drayage",
+      "nodeType": "jev",
+      "label": "Drayage qualification",
+      "status": "complete",
+      "parentNodeIds": [
+        "input"
+      ],
+      "activation": "any",
+      "input": "USDOT 142382 — COPEBESTWAY EXPRESS INC\nDBA: —\nPhysical address: CHEEKTOWAGA, NY 14212\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 17   Power units: 19\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS measures, with PortPro population rank (share of the peer population scored\nstrictly above; higher is worse):\n  unsafe_driv             0   rank 0\n  hos_driv                0   rank 0\n  veh_maint            4.84   rank 48\n  driv_fit                0   rank 0\n  contr_subst             0   rank 0\nBASIC alerts: none\nCrashes 24mo: 0   Hazmat violations 24mo: 0",
+      "startedAt": 1790025708073,
+      "output": "USDOT 142382 — COPEBESTWAY EXPRESS INC\nDBA: —\nPhysical address: CHEEKTOWAGA, NY 14212\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 17   Power units: 19\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS measures, with PortPro population rank (share of the peer population scored\nstrictly above; higher is worse):\n  unsafe_driv             0   rank 0\n  hos_driv                0   rank 0\n  veh_maint            4.84   rank 48\n  driv_fit                0   rank 0\n  contr_subst             0   rank 0\nBASIC alerts: none\nCrashes 24mo: 0   Hazmat violations 24mo: 0",
+      "answers": {
+        "operation": {
+          "type": "choice",
+          "choice": "drayage_intermodal",
+          "confidence": 0.88,
+          "probabilities": {
+            "passenger_or_household": 0,
+            "other_trucking": 0.09,
+            "not_a_carrier": 0,
+            "drayage_intermodal": 0.91
+          }
+        },
+        "port_oriented": {
+          "type": "noul",
+          "noul": 0.38,
+          "threshold": 0.7
+        },
+        "size_profile": {
+          "type": "noul",
+          "noul": 0.82,
+          "threshold": 0.65
+        },
+        "risk_profile": {
+          "type": "noul",
+          "noul": 0.67,
+          "threshold": 0.6
+        }
+      },
+      "firedHandles": [
+        "any",
+        "q:operation:drayage_intermodal",
+        "q:port_oriented:no",
+        "q:size_profile:yes",
+        "q:risk_profile:yes"
+      ],
+      "mock": false,
+      "model": "jev-1.13.0",
+      "durationMs": 1216
+    },
+    {
+      "nodeId": "llm-review",
+      "nodeType": "llm",
+      "label": "Review note",
+      "status": "complete",
+      "parentNodeIds": [
+        "jev-drayage"
+      ],
+      "activation": "any",
+      "input": "USDOT 142382 — COPEBESTWAY EXPRESS INC\nDBA: —\nPhysical address: CHEEKTOWAGA, NY 14212\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 17   Power units: 19\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS measures, with PortPro population rank (share of the peer population scored\nstrictly above; higher is worse):\n  unsafe_driv             0   rank 0\n  hos_driv                0   rank 0\n  veh_maint            4.84   rank 48\n  driv_fit                0   rank 0\n  contr_subst             0   rank 0\nBASIC alerts: none\nCrashes 24mo: 0   Hazmat violations 24mo: 0",
+      "startedAt": 1790025709530,
+      "output": "USDOT 142382 COPEBESTWAY EXPRESS INC — active, for-hire, 17 drivers/19 power units, intermodal cargo flag, based Cheektowaga NY (Buffalo area). Passes fleet-size and risk-profile checks; fails port orientation (0.38, no port metro). Only flag is veh_maint 4.84 (48th pct); no crashes, no BASIC alerts. Ask: does it truly dray to/from a port, or is that flag rail/intermodal-only?",
+      "firedHandles": [
+        "out"
+      ],
+      "mock": false,
+      "model": "deepseek-v4.1-flash",
+      "durationMs": 4481
+    },
+    {
+      "nodeId": "output",
+      "nodeType": "output",
+      "label": "Output",
+      "status": "complete",
+      "parentNodeIds": [
+        "llm-review"
+      ],
+      "activation": "any",
+      "input": "USDOT 142382 COPEBESTWAY EXPRESS INC — active, for-hire, 17 drivers/19 power units, intermodal cargo flag, based Cheektowaga NY (Buffalo area). Passes fleet-size and risk-profile checks; fails port orientation (0.38, no port metro). Only flag is veh_maint 4.84 (48th pct); no crashes, no BASIC alerts. Ask: does it truly dray to/from a port, or is that flag rail/intermodal-only?",
+      "startedAt": 1790025714247,
+      "output": "USDOT 142382 COPEBESTWAY EXPRESS INC — active, for-hire, 17 drivers/19 power units, intermodal cargo flag, based Cheektowaga NY (Buffalo area). Passes fleet-size and risk-profile checks; fails port orientation (0.38, no port metro). Only flag is veh_maint 4.84 (48th pct); no crashes, no BASIC alerts. Ask: does it truly dray to/from a port, or is that flag rail/intermodal-only?",
+      "outputs": {
+        "qualified": [],
+        "adjacent": [],
+        "review": [
+          "USDOT 142382 COPEBESTWAY EXPRESS INC — active, for-hire, 17 drivers/19 power units, intermodal cargo flag, based Cheektowaga NY (Buffalo area). Passes fleet-size and risk-profile checks; fails port orientation (0.38, no port metro). Only flag is veh_maint 4.84 (48th pct); no crashes, no BASIC alerts. Ask: does it truly dray to/from a port, or is that flag rail/intermodal-only?"
+        ]
+      },
+      "firedHandles": [],
+      "durationMs": 244
+    }
+  ]
+}

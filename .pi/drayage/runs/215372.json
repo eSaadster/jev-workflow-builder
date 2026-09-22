@@ -1,0 +1,123 @@
+{
+  "runId": "run-cuIFadi3Pr",
+  "status": "complete",
+  "trigger": "api",
+  "input": "USDOT 215372 — L & A FORWARDING INC\nDBA: L & A TRANSPORT\nPhysical address: UNION, NJ 07083\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 16   Power units: 16\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS measures, with PortPro population rank (share of the peer population scored\nstrictly above; higher is worse):\n  unsafe_driv           .43   rank 45\n  hos_driv              .04   rank 54\n  veh_maint            2.78   rank 30\n  driv_fit              .43   rank 73\n  contr_subst             0   rank 0\nBASIC alerts: none\nCrashes 24mo: 0   Hazmat violations 24mo: 0",
+  "startedAt": 1790025772360,
+  "completedAt": 1790025783045,
+  "output": {
+    "qualified": [
+      "L & A Forwarding is a drayage target: 16 power units, intermodal cargo flag, and a Union, NJ address in the NY/NJ port metro. Strongest evidence is the crgo_intermodal flag matching that port orientation — plus zero crashes and no BASIC alerts in 24 months. Our SMS ranks are mid-pack, so lead with capacity: ask about their NY/NJ chassis and empty-return pain, and position overflow spot drayage."
+    ],
+    "adjacent": [],
+    "review": []
+  },
+  "nodes": [
+    {
+      "nodeId": "input",
+      "nodeType": "input",
+      "label": "Carrier record",
+      "status": "complete",
+      "parentNodeIds": [],
+      "input": "USDOT 215372 — L & A FORWARDING INC\nDBA: L & A TRANSPORT\nPhysical address: UNION, NJ 07083\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 16   Power units: 16\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS measures, with PortPro population rank (share of the peer population scored\nstrictly above; higher is worse):\n  unsafe_driv           .43   rank 45\n  hos_driv              .04   rank 54\n  veh_maint            2.78   rank 30\n  driv_fit              .43   rank 73\n  contr_subst             0   rank 0\nBASIC alerts: none\nCrashes 24mo: 0   Hazmat violations 24mo: 0",
+      "output": "USDOT 215372 — L & A FORWARDING INC\nDBA: L & A TRANSPORT\nPhysical address: UNION, NJ 07083\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 16   Power units: 16\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS measures, with PortPro population rank (share of the peer population scored\nstrictly above; higher is worse):\n  unsafe_driv           .43   rank 45\n  hos_driv              .04   rank 54\n  veh_maint            2.78   rank 30\n  driv_fit              .43   rank 73\n  contr_subst             0   rank 0\nBASIC alerts: none\nCrashes 24mo: 0   Hazmat violations 24mo: 0",
+      "firedHandles": [
+        "out"
+      ],
+      "durationMs": 0,
+      "startedAt": 1790025775028
+    },
+    {
+      "nodeId": "jev-drayage",
+      "nodeType": "jev",
+      "label": "Drayage qualification",
+      "status": "complete",
+      "parentNodeIds": [
+        "input"
+      ],
+      "activation": "any",
+      "input": "USDOT 215372 — L & A FORWARDING INC\nDBA: L & A TRANSPORT\nPhysical address: UNION, NJ 07083\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 16   Power units: 16\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS measures, with PortPro population rank (share of the peer population scored\nstrictly above; higher is worse):\n  unsafe_driv           .43   rank 45\n  hos_driv              .04   rank 54\n  veh_maint            2.78   rank 30\n  driv_fit              .43   rank 73\n  contr_subst             0   rank 0\nBASIC alerts: none\nCrashes 24mo: 0   Hazmat violations 24mo: 0",
+      "startedAt": 1790025776281,
+      "output": "USDOT 215372 — L & A FORWARDING INC\nDBA: L & A TRANSPORT\nPhysical address: UNION, NJ 07083\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 16   Power units: 16\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS measures, with PortPro population rank (share of the peer population scored\nstrictly above; higher is worse):\n  unsafe_driv           .43   rank 45\n  hos_driv              .04   rank 54\n  veh_maint            2.78   rank 30\n  driv_fit              .43   rank 73\n  contr_subst             0   rank 0\nBASIC alerts: none\nCrashes 24mo: 0   Hazmat violations 24mo: 0",
+      "answers": {
+        "operation": {
+          "type": "choice",
+          "choice": "drayage_intermodal",
+          "confidence": 0.82,
+          "probabilities": {
+            "not_a_carrier": 0,
+            "other_trucking": 0.13,
+            "passenger_or_household": 0,
+            "drayage_intermodal": 0.87
+          }
+        },
+        "port_oriented": {
+          "type": "noul",
+          "noul": 0.96,
+          "threshold": 0.7
+        },
+        "size_profile": {
+          "type": "noul",
+          "noul": 0.85,
+          "threshold": 0.65
+        },
+        "risk_profile": {
+          "type": "noul",
+          "noul": 0.71,
+          "threshold": 0.6
+        }
+      },
+      "firedHandles": [
+        "any",
+        "q:operation:drayage_intermodal",
+        "q:port_oriented:yes",
+        "q:size_profile:yes",
+        "q:risk_profile:yes"
+      ],
+      "mock": false,
+      "model": "jev-1.13.0",
+      "durationMs": 1229
+    },
+    {
+      "nodeId": "llm-qualified",
+      "nodeType": "llm",
+      "label": "Drayage qualification note",
+      "status": "complete",
+      "parentNodeIds": [
+        "jev-drayage"
+      ],
+      "activation": "all",
+      "input": "USDOT 215372 — L & A FORWARDING INC\nDBA: L & A TRANSPORT\nPhysical address: UNION, NJ 07083\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 16   Power units: 16\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS measures, with PortPro population rank (share of the peer population scored\nstrictly above; higher is worse):\n  unsafe_driv           .43   rank 45\n  hos_driv              .04   rank 54\n  veh_maint            2.78   rank 30\n  driv_fit              .43   rank 73\n  contr_subst             0   rank 0\nBASIC alerts: none\nCrashes 24mo: 0   Hazmat violations 24mo: 0",
+      "startedAt": 1790025777842,
+      "output": "L & A Forwarding is a drayage target: 16 power units, intermodal cargo flag, and a Union, NJ address in the NY/NJ port metro. Strongest evidence is the crgo_intermodal flag matching that port orientation — plus zero crashes and no BASIC alerts in 24 months. Our SMS ranks are mid-pack, so lead with capacity: ask about their NY/NJ chassis and empty-return pain, and position overflow spot drayage.",
+      "firedHandles": [
+        "out"
+      ],
+      "mock": false,
+      "model": "deepseek-v4.1-flash",
+      "durationMs": 3951
+    },
+    {
+      "nodeId": "output",
+      "nodeType": "output",
+      "label": "Output",
+      "status": "complete",
+      "parentNodeIds": [
+        "llm-qualified"
+      ],
+      "activation": "any",
+      "input": "L & A Forwarding is a drayage target: 16 power units, intermodal cargo flag, and a Union, NJ address in the NY/NJ port metro. Strongest evidence is the crgo_intermodal flag matching that port orientation — plus zero crashes and no BASIC alerts in 24 months. Our SMS ranks are mid-pack, so lead with capacity: ask about their NY/NJ chassis and empty-return pain, and position overflow spot drayage.",
+      "startedAt": 1790025782021,
+      "output": "L & A Forwarding is a drayage target: 16 power units, intermodal cargo flag, and a Union, NJ address in the NY/NJ port metro. Strongest evidence is the crgo_intermodal flag matching that port orientation — plus zero crashes and no BASIC alerts in 24 months. Our SMS ranks are mid-pack, so lead with capacity: ask about their NY/NJ chassis and empty-return pain, and position overflow spot drayage.",
+      "outputs": {
+        "qualified": [
+          "L & A Forwarding is a drayage target: 16 power units, intermodal cargo flag, and a Union, NJ address in the NY/NJ port metro. Strongest evidence is the crgo_intermodal flag matching that port orientation — plus zero crashes and no BASIC alerts in 24 months. Our SMS ranks are mid-pack, so lead with capacity: ask about their NY/NJ chassis and empty-return pain, and position overflow spot drayage."
+        ],
+        "adjacent": [],
+        "review": []
+      },
+      "firedHandles": [],
+      "durationMs": 238
+    }
+  ]
+}

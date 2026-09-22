@@ -1,0 +1,123 @@
+{
+  "runId": "run-HdVHXQ_QdI",
+  "status": "complete",
+  "trigger": "api",
+  "input": "USDOT 279495 — VITALE HEAVY HAULING INC\nDBA: —\nPhysical address: AUBURN, NY 13021\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 4   Power units: 7\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS measures, with PortPro population rank (share of the peer population scored\nstrictly above; higher is worse):\n  unsafe_driv             0   rank 0\n  hos_driv                0   rank 0\n  veh_maint            8.33   rank 70\n  driv_fit                0   rank 0\n  contr_subst             0   rank 0\nBASIC alerts: none\nCrashes 24mo: 0   Hazmat violations 24mo: 0",
+  "startedAt": 1790025890974,
+  "completedAt": 1790025897259,
+  "output": {
+    "qualified": [],
+    "adjacent": [],
+    "review": [
+      "Vitale Heavy Hauling (USDOT 279495), Auburn NY: active, 4 drivers, 7 power units, intermodal cargo flag, safety rating S, no crashes, no BASIC alerts; only veh_maint elevated (8.33, rank 70). Failure: port-oriented location scored no (0.11) despite drayage probability 0.56. Human question: does this fleet actually haul containers from a port, or is the intermodal flag incidental?"
+    ]
+  },
+  "nodes": [
+    {
+      "nodeId": "input",
+      "nodeType": "input",
+      "label": "Carrier record",
+      "status": "complete",
+      "parentNodeIds": [],
+      "input": "USDOT 279495 — VITALE HEAVY HAULING INC\nDBA: —\nPhysical address: AUBURN, NY 13021\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 4   Power units: 7\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS measures, with PortPro population rank (share of the peer population scored\nstrictly above; higher is worse):\n  unsafe_driv             0   rank 0\n  hos_driv                0   rank 0\n  veh_maint            8.33   rank 70\n  driv_fit                0   rank 0\n  contr_subst             0   rank 0\nBASIC alerts: none\nCrashes 24mo: 0   Hazmat violations 24mo: 0",
+      "output": "USDOT 279495 — VITALE HEAVY HAULING INC\nDBA: —\nPhysical address: AUBURN, NY 13021\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 4   Power units: 7\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS measures, with PortPro population rank (share of the peer population scored\nstrictly above; higher is worse):\n  unsafe_driv             0   rank 0\n  hos_driv                0   rank 0\n  veh_maint            8.33   rank 70\n  driv_fit                0   rank 0\n  contr_subst             0   rank 0\nBASIC alerts: none\nCrashes 24mo: 0   Hazmat violations 24mo: 0",
+      "firedHandles": [
+        "out"
+      ],
+      "durationMs": 0,
+      "startedAt": 1790025891515
+    },
+    {
+      "nodeId": "jev-drayage",
+      "nodeType": "jev",
+      "label": "Drayage qualification",
+      "status": "complete",
+      "parentNodeIds": [
+        "input"
+      ],
+      "activation": "any",
+      "input": "USDOT 279495 — VITALE HEAVY HAULING INC\nDBA: —\nPhysical address: AUBURN, NY 13021\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 4   Power units: 7\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS measures, with PortPro population rank (share of the peer population scored\nstrictly above; higher is worse):\n  unsafe_driv             0   rank 0\n  hos_driv                0   rank 0\n  veh_maint            8.33   rank 70\n  driv_fit                0   rank 0\n  contr_subst             0   rank 0\nBASIC alerts: none\nCrashes 24mo: 0   Hazmat violations 24mo: 0",
+      "startedAt": 1790025891838,
+      "output": "USDOT 279495 — VITALE HEAVY HAULING INC\nDBA: —\nPhysical address: AUBURN, NY 13021\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 4   Power units: 7\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS measures, with PortPro population rank (share of the peer population scored\nstrictly above; higher is worse):\n  unsafe_driv             0   rank 0\n  hos_driv                0   rank 0\n  veh_maint            8.33   rank 70\n  driv_fit                0   rank 0\n  contr_subst             0   rank 0\nBASIC alerts: none\nCrashes 24mo: 0   Hazmat violations 24mo: 0",
+      "answers": {
+        "operation": {
+          "type": "choice",
+          "choice": "drayage_intermodal",
+          "confidence": 0.41,
+          "probabilities": {
+            "not_a_carrier": 0,
+            "drayage_intermodal": 0.56,
+            "other_trucking": 0.44,
+            "passenger_or_household": 0
+          }
+        },
+        "port_oriented": {
+          "type": "noul",
+          "noul": 0.11,
+          "threshold": 0.7
+        },
+        "size_profile": {
+          "type": "noul",
+          "noul": 0.76,
+          "threshold": 0.65
+        },
+        "risk_profile": {
+          "type": "noul",
+          "noul": 0.74,
+          "threshold": 0.6
+        }
+      },
+      "firedHandles": [
+        "any",
+        "q:operation:drayage_intermodal",
+        "q:port_oriented:no",
+        "q:size_profile:yes",
+        "q:risk_profile:yes"
+      ],
+      "mock": false,
+      "model": "jev-1.13.0",
+      "durationMs": 1254
+    },
+    {
+      "nodeId": "llm-review",
+      "nodeType": "llm",
+      "label": "Review note",
+      "status": "complete",
+      "parentNodeIds": [
+        "jev-drayage"
+      ],
+      "activation": "any",
+      "input": "USDOT 279495 — VITALE HEAVY HAULING INC\nDBA: —\nPhysical address: AUBURN, NY 13021\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 4   Power units: 7\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS measures, with PortPro population rank (share of the peer population scored\nstrictly above; higher is worse):\n  unsafe_driv             0   rank 0\n  hos_driv                0   rank 0\n  veh_maint            8.33   rank 70\n  driv_fit                0   rank 0\n  contr_subst             0   rank 0\nBASIC alerts: none\nCrashes 24mo: 0   Hazmat violations 24mo: 0",
+      "startedAt": 1790025893321,
+      "output": "Vitale Heavy Hauling (USDOT 279495), Auburn NY: active, 4 drivers, 7 power units, intermodal cargo flag, safety rating S, no crashes, no BASIC alerts; only veh_maint elevated (8.33, rank 70). Failure: port-oriented location scored no (0.11) despite drayage probability 0.56. Human question: does this fleet actually haul containers from a port, or is the intermodal flag incidental?",
+      "firedHandles": [
+        "out"
+      ],
+      "mock": false,
+      "model": "deepseek-v4.1-flash",
+      "durationMs": 3224
+    },
+    {
+      "nodeId": "output",
+      "nodeType": "output",
+      "label": "Output",
+      "status": "complete",
+      "parentNodeIds": [
+        "llm-review"
+      ],
+      "activation": "any",
+      "input": "Vitale Heavy Hauling (USDOT 279495), Auburn NY: active, 4 drivers, 7 power units, intermodal cargo flag, safety rating S, no crashes, no BASIC alerts; only veh_maint elevated (8.33, rank 70). Failure: port-oriented location scored no (0.11) despite drayage probability 0.56. Human question: does this fleet actually haul containers from a port, or is the intermodal flag incidental?",
+      "startedAt": 1790025896781,
+      "output": "Vitale Heavy Hauling (USDOT 279495), Auburn NY: active, 4 drivers, 7 power units, intermodal cargo flag, safety rating S, no crashes, no BASIC alerts; only veh_maint elevated (8.33, rank 70). Failure: port-oriented location scored no (0.11) despite drayage probability 0.56. Human question: does this fleet actually haul containers from a port, or is the intermodal flag incidental?",
+      "outputs": {
+        "qualified": [],
+        "adjacent": [],
+        "review": [
+          "Vitale Heavy Hauling (USDOT 279495), Auburn NY: active, 4 drivers, 7 power units, intermodal cargo flag, safety rating S, no crashes, no BASIC alerts; only veh_maint elevated (8.33, rank 70). Failure: port-oriented location scored no (0.11) despite drayage probability 0.56. Human question: does this fleet actually haul containers from a port, or is the intermodal flag incidental?"
+        ]
+      },
+      "firedHandles": [],
+      "durationMs": 244
+    }
+  ]
+}

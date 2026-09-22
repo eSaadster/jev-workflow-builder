@@ -1,0 +1,123 @@
+{
+  "runId": "run-V9tvnjT_D3",
+  "status": "complete",
+  "trigger": "api",
+  "input": "USDOT 327521 — JAMES O'DONOGHUE\nDBA: M G K SERVICES\nPhysical address: STAFFORD, NY 14143\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 15   Power units: 16\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS measures, with PortPro population rank (share of the peer population scored\nstrictly above; higher is worse):\n  unsafe_driv          1.73   rank 60\n  hos_driv                0   rank 0\n  veh_maint               6   rank 56\n  driv_fit              .14   rank 64\n  contr_subst             0   rank 0\nBASIC alerts: none\nCrashes 24mo: 3   Hazmat violations 24mo: 0",
+  "startedAt": 1790025974252,
+  "completedAt": 1790025988005,
+  "output": {
+    "qualified": [],
+    "adjacent": [],
+    "review": [
+      "USDOT 327521 (M G K SERVICES, Stafford NY) is an active authorized-for-hire carrier: 15 drivers/16 power units, intermodal cargo, satisfactory safety, no BASIC alerts, 3 crashes/24mo. It passes operation (0.89), fleet fit (0.86), and risk fit (0.76), but fails only port-oriented location (no, 0.36). Human question: Is Stafford NY genuinely serving a port despite the low location score, or is this non-port intermodal trucking?"
+    ]
+  },
+  "nodes": [
+    {
+      "nodeId": "input",
+      "nodeType": "input",
+      "label": "Carrier record",
+      "status": "complete",
+      "parentNodeIds": [],
+      "input": "USDOT 327521 — JAMES O'DONOGHUE\nDBA: M G K SERVICES\nPhysical address: STAFFORD, NY 14143\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 15   Power units: 16\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS measures, with PortPro population rank (share of the peer population scored\nstrictly above; higher is worse):\n  unsafe_driv          1.73   rank 60\n  hos_driv                0   rank 0\n  veh_maint               6   rank 56\n  driv_fit              .14   rank 64\n  contr_subst             0   rank 0\nBASIC alerts: none\nCrashes 24mo: 3   Hazmat violations 24mo: 0",
+      "output": "USDOT 327521 — JAMES O'DONOGHUE\nDBA: M G K SERVICES\nPhysical address: STAFFORD, NY 14143\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 15   Power units: 16\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS measures, with PortPro population rank (share of the peer population scored\nstrictly above; higher is worse):\n  unsafe_driv          1.73   rank 60\n  hos_driv                0   rank 0\n  veh_maint               6   rank 56\n  driv_fit              .14   rank 64\n  contr_subst             0   rank 0\nBASIC alerts: none\nCrashes 24mo: 3   Hazmat violations 24mo: 0",
+      "firedHandles": [
+        "out"
+      ],
+      "durationMs": 0,
+      "startedAt": 1790025974759
+    },
+    {
+      "nodeId": "jev-drayage",
+      "nodeType": "jev",
+      "label": "Drayage qualification",
+      "status": "complete",
+      "parentNodeIds": [
+        "input"
+      ],
+      "activation": "any",
+      "input": "USDOT 327521 — JAMES O'DONOGHUE\nDBA: M G K SERVICES\nPhysical address: STAFFORD, NY 14143\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 15   Power units: 16\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS measures, with PortPro population rank (share of the peer population scored\nstrictly above; higher is worse):\n  unsafe_driv          1.73   rank 60\n  hos_driv                0   rank 0\n  veh_maint               6   rank 56\n  driv_fit              .14   rank 64\n  contr_subst             0   rank 0\nBASIC alerts: none\nCrashes 24mo: 3   Hazmat violations 24mo: 0",
+      "startedAt": 1790025975053,
+      "output": "USDOT 327521 — JAMES O'DONOGHUE\nDBA: M G K SERVICES\nPhysical address: STAFFORD, NY 14143\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 15   Power units: 16\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS measures, with PortPro population rank (share of the peer population scored\nstrictly above; higher is worse):\n  unsafe_driv          1.73   rank 60\n  hos_driv                0   rank 0\n  veh_maint               6   rank 56\n  driv_fit              .14   rank 64\n  contr_subst             0   rank 0\nBASIC alerts: none\nCrashes 24mo: 3   Hazmat violations 24mo: 0",
+      "answers": {
+        "operation": {
+          "type": "choice",
+          "choice": "drayage_intermodal",
+          "confidence": 0.85,
+          "probabilities": {
+            "other_trucking": 0.11,
+            "drayage_intermodal": 0.89,
+            "passenger_or_household": 0,
+            "not_a_carrier": 0
+          }
+        },
+        "port_oriented": {
+          "type": "noul",
+          "noul": 0.36,
+          "threshold": 0.7
+        },
+        "size_profile": {
+          "type": "noul",
+          "noul": 0.86,
+          "threshold": 0.65
+        },
+        "risk_profile": {
+          "type": "noul",
+          "noul": 0.76,
+          "threshold": 0.6
+        }
+      },
+      "firedHandles": [
+        "any",
+        "q:operation:drayage_intermodal",
+        "q:port_oriented:no",
+        "q:size_profile:yes",
+        "q:risk_profile:yes"
+      ],
+      "mock": false,
+      "model": "jev-1.13.0",
+      "durationMs": 1265
+    },
+    {
+      "nodeId": "llm-review",
+      "nodeType": "llm",
+      "label": "Review note",
+      "status": "complete",
+      "parentNodeIds": [
+        "jev-drayage"
+      ],
+      "activation": "any",
+      "input": "USDOT 327521 — JAMES O'DONOGHUE\nDBA: M G K SERVICES\nPhysical address: STAFFORD, NY 14143\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 15   Power units: 16\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS measures, with PortPro population rank (share of the peer population scored\nstrictly above; higher is worse):\n  unsafe_driv          1.73   rank 60\n  hos_driv                0   rank 0\n  veh_maint               6   rank 56\n  driv_fit              .14   rank 64\n  contr_subst             0   rank 0\nBASIC alerts: none\nCrashes 24mo: 3   Hazmat violations 24mo: 0",
+      "startedAt": 1790025976535,
+      "output": "USDOT 327521 (M G K SERVICES, Stafford NY) is an active authorized-for-hire carrier: 15 drivers/16 power units, intermodal cargo, satisfactory safety, no BASIC alerts, 3 crashes/24mo. It passes operation (0.89), fleet fit (0.86), and risk fit (0.76), but fails only port-oriented location (no, 0.36). Human question: Is Stafford NY genuinely serving a port despite the low location score, or is this non-port intermodal trucking?",
+      "firedHandles": [
+        "out"
+      ],
+      "mock": false,
+      "model": "deepseek-v4.1-flash",
+      "durationMs": 9398
+    },
+    {
+      "nodeId": "output",
+      "nodeType": "output",
+      "label": "Output",
+      "status": "complete",
+      "parentNodeIds": [
+        "llm-review"
+      ],
+      "activation": "any",
+      "input": "USDOT 327521 (M G K SERVICES, Stafford NY) is an active authorized-for-hire carrier: 15 drivers/16 power units, intermodal cargo, satisfactory safety, no BASIC alerts, 3 crashes/24mo. It passes operation (0.89), fleet fit (0.86), and risk fit (0.76), but fails only port-oriented location (no, 0.36). Human question: Is Stafford NY genuinely serving a port despite the low location score, or is this non-port intermodal trucking?",
+      "startedAt": 1790025986170,
+      "output": "USDOT 327521 (M G K SERVICES, Stafford NY) is an active authorized-for-hire carrier: 15 drivers/16 power units, intermodal cargo, satisfactory safety, no BASIC alerts, 3 crashes/24mo. It passes operation (0.89), fleet fit (0.86), and risk fit (0.76), but fails only port-oriented location (no, 0.36). Human question: Is Stafford NY genuinely serving a port despite the low location score, or is this non-port intermodal trucking?",
+      "outputs": {
+        "qualified": [],
+        "adjacent": [],
+        "review": [
+          "USDOT 327521 (M G K SERVICES, Stafford NY) is an active authorized-for-hire carrier: 15 drivers/16 power units, intermodal cargo, satisfactory safety, no BASIC alerts, 3 crashes/24mo. It passes operation (0.89), fleet fit (0.86), and risk fit (0.76), but fails only port-oriented location (no, 0.36). Human question: Is Stafford NY genuinely serving a port despite the low location score, or is this non-port intermodal trucking?"
+        ]
+      },
+      "firedHandles": [],
+      "durationMs": 999
+    }
+  ]
+}

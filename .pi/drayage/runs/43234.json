@@ -1,0 +1,123 @@
+{
+  "runId": "run-LAyH3VboUS",
+  "status": "complete",
+  "trigger": "api",
+  "input": "USDOT 43234 — LESTER FELLOWS CO INC\nDBA: —\nPhysical address: BURLINGTON, NJ 08016\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 5   Power units: 5\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS measures, with PortPro population rank (share of the peer population scored\nstrictly above; higher is worse):\n  unsafe_driv             0   rank 0\n  hos_driv             1.16   rank 81\n  veh_maint            5.75   rank 55\n  driv_fit                0   rank 0\n  contr_subst             0   rank 0\nBASIC alerts: none\nCrashes 24mo: 1   Hazmat violations 24mo: 0",
+  "startedAt": 1790025636351,
+  "completedAt": 1790025649765,
+  "output": {
+    "qualified": [
+      "Lester Fellows Co Inc (USDOT 43234) qualifies for drayage: active, authorized-for-hire, 5 drivers/5 power units, intermodal cargo flag, Burlington NJ base in the Philadelphia port metro. Strongest evidence: 0.97 classifier probability for drayage_intermodal. Safety is acceptable—rating S, no BASIC alerts, only 1 crash/0 hazmat in 24 months; watch HOS rank 81. Open by confirming Philly drayage lanes and asking about available intermodal capacity and current port work."
+    ],
+    "adjacent": [],
+    "review": []
+  },
+  "nodes": [
+    {
+      "nodeId": "input",
+      "nodeType": "input",
+      "label": "Carrier record",
+      "status": "complete",
+      "parentNodeIds": [],
+      "input": "USDOT 43234 — LESTER FELLOWS CO INC\nDBA: —\nPhysical address: BURLINGTON, NJ 08016\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 5   Power units: 5\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS measures, with PortPro population rank (share of the peer population scored\nstrictly above; higher is worse):\n  unsafe_driv             0   rank 0\n  hos_driv             1.16   rank 81\n  veh_maint            5.75   rank 55\n  driv_fit                0   rank 0\n  contr_subst             0   rank 0\nBASIC alerts: none\nCrashes 24mo: 1   Hazmat violations 24mo: 0",
+      "output": "USDOT 43234 — LESTER FELLOWS CO INC\nDBA: —\nPhysical address: BURLINGTON, NJ 08016\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 5   Power units: 5\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS measures, with PortPro population rank (share of the peer population scored\nstrictly above; higher is worse):\n  unsafe_driv             0   rank 0\n  hos_driv             1.16   rank 81\n  veh_maint            5.75   rank 55\n  driv_fit                0   rank 0\n  contr_subst             0   rank 0\nBASIC alerts: none\nCrashes 24mo: 1   Hazmat violations 24mo: 0",
+      "firedHandles": [
+        "out"
+      ],
+      "durationMs": 0,
+      "startedAt": 1790025636881
+    },
+    {
+      "nodeId": "jev-drayage",
+      "nodeType": "jev",
+      "label": "Drayage qualification",
+      "status": "complete",
+      "parentNodeIds": [
+        "input"
+      ],
+      "activation": "any",
+      "input": "USDOT 43234 — LESTER FELLOWS CO INC\nDBA: —\nPhysical address: BURLINGTON, NJ 08016\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 5   Power units: 5\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS measures, with PortPro population rank (share of the peer population scored\nstrictly above; higher is worse):\n  unsafe_driv             0   rank 0\n  hos_driv             1.16   rank 81\n  veh_maint            5.75   rank 55\n  driv_fit                0   rank 0\n  contr_subst             0   rank 0\nBASIC alerts: none\nCrashes 24mo: 1   Hazmat violations 24mo: 0",
+      "startedAt": 1790025637234,
+      "output": "USDOT 43234 — LESTER FELLOWS CO INC\nDBA: —\nPhysical address: BURLINGTON, NJ 08016\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 5   Power units: 5\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS measures, with PortPro population rank (share of the peer population scored\nstrictly above; higher is worse):\n  unsafe_driv             0   rank 0\n  hos_driv             1.16   rank 81\n  veh_maint            5.75   rank 55\n  driv_fit                0   rank 0\n  contr_subst             0   rank 0\nBASIC alerts: none\nCrashes 24mo: 1   Hazmat violations 24mo: 0",
+      "answers": {
+        "operation": {
+          "type": "choice",
+          "choice": "drayage_intermodal",
+          "confidence": 0.95,
+          "probabilities": {
+            "drayage_intermodal": 0.97,
+            "not_a_carrier": 0,
+            "passenger_or_household": 0,
+            "other_trucking": 0.03
+          }
+        },
+        "port_oriented": {
+          "type": "noul",
+          "noul": 0.77,
+          "threshold": 0.7
+        },
+        "size_profile": {
+          "type": "noul",
+          "noul": 0.84,
+          "threshold": 0.65
+        },
+        "risk_profile": {
+          "type": "noul",
+          "noul": 0.64,
+          "threshold": 0.6
+        }
+      },
+      "firedHandles": [
+        "any",
+        "q:operation:drayage_intermodal",
+        "q:port_oriented:yes",
+        "q:size_profile:yes",
+        "q:risk_profile:yes"
+      ],
+      "mock": false,
+      "model": "jev-1.13.0",
+      "durationMs": 1356
+    },
+    {
+      "nodeId": "llm-qualified",
+      "nodeType": "llm",
+      "label": "Drayage qualification note",
+      "status": "complete",
+      "parentNodeIds": [
+        "jev-drayage"
+      ],
+      "activation": "all",
+      "input": "USDOT 43234 — LESTER FELLOWS CO INC\nDBA: —\nPhysical address: BURLINGTON, NJ 08016\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 5   Power units: 5\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS measures, with PortPro population rank (share of the peer population scored\nstrictly above; higher is worse):\n  unsafe_driv             0   rank 0\n  hos_driv             1.16   rank 81\n  veh_maint            5.75   rank 55\n  driv_fit                0   rank 0\n  contr_subst             0   rank 0\nBASIC alerts: none\nCrashes 24mo: 1   Hazmat violations 24mo: 0",
+      "startedAt": 1790025638824,
+      "output": "Lester Fellows Co Inc (USDOT 43234) qualifies for drayage: active, authorized-for-hire, 5 drivers/5 power units, intermodal cargo flag, Burlington NJ base in the Philadelphia port metro. Strongest evidence: 0.97 classifier probability for drayage_intermodal. Safety is acceptable—rating S, no BASIC alerts, only 1 crash/0 hazmat in 24 months; watch HOS rank 81. Open by confirming Philly drayage lanes and asking about available intermodal capacity and current port work.",
+      "firedHandles": [
+        "out"
+      ],
+      "mock": false,
+      "model": "deepseek-v4.1-flash",
+      "durationMs": 10249
+    },
+    {
+      "nodeId": "output",
+      "nodeType": "output",
+      "label": "Output",
+      "status": "complete",
+      "parentNodeIds": [
+        "llm-qualified"
+      ],
+      "activation": "any",
+      "input": "Lester Fellows Co Inc (USDOT 43234) qualifies for drayage: active, authorized-for-hire, 5 drivers/5 power units, intermodal cargo flag, Burlington NJ base in the Philadelphia port metro. Strongest evidence: 0.97 classifier probability for drayage_intermodal. Safety is acceptable—rating S, no BASIC alerts, only 1 crash/0 hazmat in 24 months; watch HOS rank 81. Open by confirming Philly drayage lanes and asking about available intermodal capacity and current port work.",
+      "startedAt": 1790025649305,
+      "output": "Lester Fellows Co Inc (USDOT 43234) qualifies for drayage: active, authorized-for-hire, 5 drivers/5 power units, intermodal cargo flag, Burlington NJ base in the Philadelphia port metro. Strongest evidence: 0.97 classifier probability for drayage_intermodal. Safety is acceptable—rating S, no BASIC alerts, only 1 crash/0 hazmat in 24 months; watch HOS rank 81. Open by confirming Philly drayage lanes and asking about available intermodal capacity and current port work.",
+      "outputs": {
+        "qualified": [
+          "Lester Fellows Co Inc (USDOT 43234) qualifies for drayage: active, authorized-for-hire, 5 drivers/5 power units, intermodal cargo flag, Burlington NJ base in the Philadelphia port metro. Strongest evidence: 0.97 classifier probability for drayage_intermodal. Safety is acceptable—rating S, no BASIC alerts, only 1 crash/0 hazmat in 24 months; watch HOS rank 81. Open by confirming Philly drayage lanes and asking about available intermodal capacity and current port work."
+        ],
+        "adjacent": [],
+        "review": []
+      },
+      "firedHandles": [],
+      "durationMs": 237
+    }
+  ]
+}

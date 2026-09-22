@@ -1,0 +1,123 @@
+{
+  "runId": "run-yD0k9yo3nx",
+  "status": "complete",
+  "trigger": "api",
+  "input": "USDOT 268775 — KM TRANSPORTATION CO INC\nDBA: —\nPhysical address: LOGAN TOWNSHIP, NJ 08085\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 17   Power units: 30\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS measures, with PortPro population rank (share of the peer population scored\nstrictly above; higher is worse):\n  unsafe_driv           .16   rank 41\n  hos_driv              .06   rank 55\n  veh_maint               6   rank 56\n  driv_fit                0   rank 0\n  contr_subst             0   rank 0\nBASIC alerts: none\nCrashes 24mo: 0   Hazmat violations 24mo: 0",
+  "startedAt": 1790025832327,
+  "completedAt": 1790025843460,
+  "output": {
+    "qualified": [],
+    "adjacent": [],
+    "review": [
+      "USDOT 268775 is an active authorized-for-hire intermodal drayage carrier in Logan Twp, NJ: 17 drivers, 30 power units, clean safety/crash history. It passed operation, port-location, and risk-fit screens. It failed only fleet-size fit (0.40 probability): too many power units for the screen’s drayage target. Human question: Should this port-oriented intermodal carrier be excluded solely for fleet size, or does its fit override the threshold?"
+    ]
+  },
+  "nodes": [
+    {
+      "nodeId": "input",
+      "nodeType": "input",
+      "label": "Carrier record",
+      "status": "complete",
+      "parentNodeIds": [],
+      "input": "USDOT 268775 — KM TRANSPORTATION CO INC\nDBA: —\nPhysical address: LOGAN TOWNSHIP, NJ 08085\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 17   Power units: 30\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS measures, with PortPro population rank (share of the peer population scored\nstrictly above; higher is worse):\n  unsafe_driv           .16   rank 41\n  hos_driv              .06   rank 55\n  veh_maint               6   rank 56\n  driv_fit                0   rank 0\n  contr_subst             0   rank 0\nBASIC alerts: none\nCrashes 24mo: 0   Hazmat violations 24mo: 0",
+      "output": "USDOT 268775 — KM TRANSPORTATION CO INC\nDBA: —\nPhysical address: LOGAN TOWNSHIP, NJ 08085\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 17   Power units: 30\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS measures, with PortPro population rank (share of the peer population scored\nstrictly above; higher is worse):\n  unsafe_driv           .16   rank 41\n  hos_driv              .06   rank 55\n  veh_maint               6   rank 56\n  driv_fit                0   rank 0\n  contr_subst             0   rank 0\nBASIC alerts: none\nCrashes 24mo: 0   Hazmat violations 24mo: 0",
+      "firedHandles": [
+        "out"
+      ],
+      "durationMs": 0,
+      "startedAt": 1790025833464
+    },
+    {
+      "nodeId": "jev-drayage",
+      "nodeType": "jev",
+      "label": "Drayage qualification",
+      "status": "complete",
+      "parentNodeIds": [
+        "input"
+      ],
+      "activation": "any",
+      "input": "USDOT 268775 — KM TRANSPORTATION CO INC\nDBA: —\nPhysical address: LOGAN TOWNSHIP, NJ 08085\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 17   Power units: 30\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS measures, with PortPro population rank (share of the peer population scored\nstrictly above; higher is worse):\n  unsafe_driv           .16   rank 41\n  hos_driv              .06   rank 55\n  veh_maint               6   rank 56\n  driv_fit                0   rank 0\n  contr_subst             0   rank 0\nBASIC alerts: none\nCrashes 24mo: 0   Hazmat violations 24mo: 0",
+      "startedAt": 1790025834197,
+      "output": "USDOT 268775 — KM TRANSPORTATION CO INC\nDBA: —\nPhysical address: LOGAN TOWNSHIP, NJ 08085\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 17   Power units: 30\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS measures, with PortPro population rank (share of the peer population scored\nstrictly above; higher is worse):\n  unsafe_driv           .16   rank 41\n  hos_driv              .06   rank 55\n  veh_maint               6   rank 56\n  driv_fit                0   rank 0\n  contr_subst             0   rank 0\nBASIC alerts: none\nCrashes 24mo: 0   Hazmat violations 24mo: 0",
+      "answers": {
+        "operation": {
+          "type": "choice",
+          "choice": "drayage_intermodal",
+          "confidence": 0.72,
+          "probabilities": {
+            "drayage_intermodal": 0.79,
+            "other_trucking": 0.21,
+            "passenger_or_household": 0,
+            "not_a_carrier": 0
+          }
+        },
+        "port_oriented": {
+          "type": "noul",
+          "noul": 0.82,
+          "threshold": 0.7
+        },
+        "size_profile": {
+          "type": "noul",
+          "noul": 0.4,
+          "threshold": 0.65
+        },
+        "risk_profile": {
+          "type": "noul",
+          "noul": 0.71,
+          "threshold": 0.6
+        }
+      },
+      "firedHandles": [
+        "any",
+        "q:operation:drayage_intermodal",
+        "q:port_oriented:yes",
+        "q:size_profile:no",
+        "q:risk_profile:yes"
+      ],
+      "mock": false,
+      "model": "jev-1.13.0",
+      "durationMs": 1272
+    },
+    {
+      "nodeId": "llm-review",
+      "nodeType": "llm",
+      "label": "Review note",
+      "status": "complete",
+      "parentNodeIds": [
+        "jev-drayage"
+      ],
+      "activation": "any",
+      "input": "USDOT 268775 — KM TRANSPORTATION CO INC\nDBA: —\nPhysical address: LOGAN TOWNSHIP, NJ 08085\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 17   Power units: 30\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS measures, with PortPro population rank (share of the peer population scored\nstrictly above; higher is worse):\n  unsafe_driv           .16   rank 41\n  hos_driv              .06   rank 55\n  veh_maint               6   rank 56\n  driv_fit                0   rank 0\n  contr_subst             0   rank 0\nBASIC alerts: none\nCrashes 24mo: 0   Hazmat violations 24mo: 0",
+      "startedAt": 1790025835681,
+      "output": "USDOT 268775 is an active authorized-for-hire intermodal drayage carrier in Logan Twp, NJ: 17 drivers, 30 power units, clean safety/crash history. It passed operation, port-location, and risk-fit screens. It failed only fleet-size fit (0.40 probability): too many power units for the screen’s drayage target. Human question: Should this port-oriented intermodal carrier be excluded solely for fleet size, or does its fit override the threshold?",
+      "firedHandles": [
+        "out"
+      ],
+      "mock": false,
+      "model": "deepseek-v4.1-flash",
+      "durationMs": 6374
+    },
+    {
+      "nodeId": "output",
+      "nodeType": "output",
+      "label": "Output",
+      "status": "complete",
+      "parentNodeIds": [
+        "llm-review"
+      ],
+      "activation": "any",
+      "input": "USDOT 268775 is an active authorized-for-hire intermodal drayage carrier in Logan Twp, NJ: 17 drivers, 30 power units, clean safety/crash history. It passed operation, port-location, and risk-fit screens. It failed only fleet-size fit (0.40 probability): too many power units for the screen’s drayage target. Human question: Should this port-oriented intermodal carrier be excluded solely for fleet size, or does its fit override the threshold?",
+      "startedAt": 1790025842285,
+      "output": "USDOT 268775 is an active authorized-for-hire intermodal drayage carrier in Logan Twp, NJ: 17 drivers, 30 power units, clean safety/crash history. It passed operation, port-location, and risk-fit screens. It failed only fleet-size fit (0.40 probability): too many power units for the screen’s drayage target. Human question: Should this port-oriented intermodal carrier be excluded solely for fleet size, or does its fit override the threshold?",
+      "outputs": {
+        "qualified": [],
+        "adjacent": [],
+        "review": [
+          "USDOT 268775 is an active authorized-for-hire intermodal drayage carrier in Logan Twp, NJ: 17 drivers, 30 power units, clean safety/crash history. It passed operation, port-location, and risk-fit screens. It failed only fleet-size fit (0.40 probability): too many power units for the screen’s drayage target. Human question: Should this port-oriented intermodal carrier be excluded solely for fleet size, or does its fit override the threshold?"
+        ]
+      },
+      "firedHandles": [],
+      "durationMs": 947
+    }
+  ]
+}

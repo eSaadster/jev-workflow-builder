@@ -1,0 +1,123 @@
+{
+  "runId": "run-85eDPYHHdE",
+  "status": "complete",
+  "trigger": "api",
+  "input": "USDOT 259173 — JAN PACKAGING INC\nDBA: —\nPhysical address: DOVER, NJ 07801\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 5   Power units: 11\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS measures, with PortPro population rank (share of the peer population scored\nstrictly above; higher is worse):\n  unsafe_driv          3.16   rank 71\n  hos_driv              .41   rank 68\n  veh_maint            8.57   rank 72\n  driv_fit             1.66   rank 90\n  contr_subst             0   rank 0\nBASIC alerts: none\nCrashes 24mo: 0   Hazmat violations 24mo: 0",
+  "startedAt": 1790025783721,
+  "completedAt": 1790025798301,
+  "output": {
+    "qualified": [
+      "JAN PACKAGING qualifies as a NY/NJ drayage target: active authorized-for-hire, 11 power units/5 drivers, and the strongest evidence is its crgo_intermodal flag (with 0 crashes and no BASIC alerts). Matched port metro: New York/New Jersey. Open by confirming they run intermodal containers out of Port Newark/Elizabeth and ask about current drayage capacity, chassis, and empty-return coverage; qualify appointment and per-diem performance."
+    ],
+    "adjacent": [],
+    "review": []
+  },
+  "nodes": [
+    {
+      "nodeId": "input",
+      "nodeType": "input",
+      "label": "Carrier record",
+      "status": "complete",
+      "parentNodeIds": [],
+      "input": "USDOT 259173 — JAN PACKAGING INC\nDBA: —\nPhysical address: DOVER, NJ 07801\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 5   Power units: 11\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS measures, with PortPro population rank (share of the peer population scored\nstrictly above; higher is worse):\n  unsafe_driv          3.16   rank 71\n  hos_driv              .41   rank 68\n  veh_maint            8.57   rank 72\n  driv_fit             1.66   rank 90\n  contr_subst             0   rank 0\nBASIC alerts: none\nCrashes 24mo: 0   Hazmat violations 24mo: 0",
+      "output": "USDOT 259173 — JAN PACKAGING INC\nDBA: —\nPhysical address: DOVER, NJ 07801\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 5   Power units: 11\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS measures, with PortPro population rank (share of the peer population scored\nstrictly above; higher is worse):\n  unsafe_driv          3.16   rank 71\n  hos_driv              .41   rank 68\n  veh_maint            8.57   rank 72\n  driv_fit             1.66   rank 90\n  contr_subst             0   rank 0\nBASIC alerts: none\nCrashes 24mo: 0   Hazmat violations 24mo: 0",
+      "firedHandles": [
+        "out"
+      ],
+      "durationMs": 0,
+      "startedAt": 1790025784211
+    },
+    {
+      "nodeId": "jev-drayage",
+      "nodeType": "jev",
+      "label": "Drayage qualification",
+      "status": "complete",
+      "parentNodeIds": [
+        "input"
+      ],
+      "activation": "any",
+      "input": "USDOT 259173 — JAN PACKAGING INC\nDBA: —\nPhysical address: DOVER, NJ 07801\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 5   Power units: 11\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS measures, with PortPro population rank (share of the peer population scored\nstrictly above; higher is worse):\n  unsafe_driv          3.16   rank 71\n  hos_driv              .41   rank 68\n  veh_maint            8.57   rank 72\n  driv_fit             1.66   rank 90\n  contr_subst             0   rank 0\nBASIC alerts: none\nCrashes 24mo: 0   Hazmat violations 24mo: 0",
+      "startedAt": 1790025784531,
+      "output": "USDOT 259173 — JAN PACKAGING INC\nDBA: —\nPhysical address: DOVER, NJ 07801\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 5   Power units: 11\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS measures, with PortPro population rank (share of the peer population scored\nstrictly above; higher is worse):\n  unsafe_driv          3.16   rank 71\n  hos_driv              .41   rank 68\n  veh_maint            8.57   rank 72\n  driv_fit             1.66   rank 90\n  contr_subst             0   rank 0\nBASIC alerts: none\nCrashes 24mo: 0   Hazmat violations 24mo: 0",
+      "answers": {
+        "operation": {
+          "type": "choice",
+          "choice": "drayage_intermodal",
+          "confidence": 0.69,
+          "probabilities": {
+            "other_trucking": 0.22,
+            "not_a_carrier": 0.01,
+            "passenger_or_household": 0,
+            "drayage_intermodal": 0.77
+          }
+        },
+        "port_oriented": {
+          "type": "noul",
+          "noul": 0.79,
+          "threshold": 0.7
+        },
+        "size_profile": {
+          "type": "noul",
+          "noul": 0.79,
+          "threshold": 0.65
+        },
+        "risk_profile": {
+          "type": "noul",
+          "noul": 0.68,
+          "threshold": 0.6
+        }
+      },
+      "firedHandles": [
+        "any",
+        "q:operation:drayage_intermodal",
+        "q:port_oriented:yes",
+        "q:size_profile:yes",
+        "q:risk_profile:yes"
+      ],
+      "mock": false,
+      "model": "jev-1.13.0",
+      "durationMs": 1632
+    },
+    {
+      "nodeId": "llm-qualified",
+      "nodeType": "llm",
+      "label": "Drayage qualification note",
+      "status": "complete",
+      "parentNodeIds": [
+        "jev-drayage"
+      ],
+      "activation": "all",
+      "input": "USDOT 259173 — JAN PACKAGING INC\nDBA: —\nPhysical address: DOVER, NJ 07801\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 5   Power units: 11\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS measures, with PortPro population rank (share of the peer population scored\nstrictly above; higher is worse):\n  unsafe_driv          3.16   rank 71\n  hos_driv              .41   rank 68\n  veh_maint            8.57   rank 72\n  driv_fit             1.66   rank 90\n  contr_subst             0   rank 0\nBASIC alerts: none\nCrashes 24mo: 0   Hazmat violations 24mo: 0",
+      "startedAt": 1790025786407,
+      "output": "JAN PACKAGING qualifies as a NY/NJ drayage target: active authorized-for-hire, 11 power units/5 drivers, and the strongest evidence is its crgo_intermodal flag (with 0 crashes and no BASIC alerts). Matched port metro: New York/New Jersey. Open by confirming they run intermodal containers out of Port Newark/Elizabeth and ask about current drayage capacity, chassis, and empty-return coverage; qualify appointment and per-diem performance.",
+      "firedHandles": [
+        "out"
+      ],
+      "mock": false,
+      "model": "deepseek-v4.1-flash",
+      "durationMs": 10734
+    },
+    {
+      "nodeId": "output",
+      "nodeType": "output",
+      "label": "Output",
+      "status": "complete",
+      "parentNodeIds": [
+        "llm-qualified"
+      ],
+      "activation": "any",
+      "input": "JAN PACKAGING qualifies as a NY/NJ drayage target: active authorized-for-hire, 11 power units/5 drivers, and the strongest evidence is its crgo_intermodal flag (with 0 crashes and no BASIC alerts). Matched port metro: New York/New Jersey. Open by confirming they run intermodal containers out of Port Newark/Elizabeth and ask about current drayage capacity, chassis, and empty-return coverage; qualify appointment and per-diem performance.",
+      "startedAt": 1790025797627,
+      "output": "JAN PACKAGING qualifies as a NY/NJ drayage target: active authorized-for-hire, 11 power units/5 drivers, and the strongest evidence is its crgo_intermodal flag (with 0 crashes and no BASIC alerts). Matched port metro: New York/New Jersey. Open by confirming they run intermodal containers out of Port Newark/Elizabeth and ask about current drayage capacity, chassis, and empty-return coverage; qualify appointment and per-diem performance.",
+      "outputs": {
+        "qualified": [
+          "JAN PACKAGING qualifies as a NY/NJ drayage target: active authorized-for-hire, 11 power units/5 drivers, and the strongest evidence is its crgo_intermodal flag (with 0 crashes and no BASIC alerts). Matched port metro: New York/New Jersey. Open by confirming they run intermodal containers out of Port Newark/Elizabeth and ask about current drayage capacity, chassis, and empty-return coverage; qualify appointment and per-diem performance."
+        ],
+        "adjacent": [],
+        "review": []
+      },
+      "firedHandles": [],
+      "durationMs": 434
+    }
+  ]
+}

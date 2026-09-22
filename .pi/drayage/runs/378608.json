@@ -1,0 +1,123 @@
+{
+  "runId": "run-Up3LleuGIK",
+  "status": "complete",
+  "trigger": "api",
+  "input": "USDOT 378608 — CIOFFI TOWING SERVICE INC\nDBA: —\nPhysical address: CHERRY HILL, NJ 08034\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 15   Power units: 17\nCargo flags: crgo_intermodal\nSafety rating: not rated\nSMS measures, with PortPro population rank (share of the peer population scored\nstrictly above; higher is worse):\n  unsafe_driv          3.12   rank 71\n  hos_driv                0   rank 0\n  veh_maint            3.94   rank 40\n  driv_fit              .22   rank 67\n  contr_subst             0   rank 0\nBASIC alerts: none\nCrashes 24mo: 3   Hazmat violations 24mo: 0",
+  "startedAt": 1790026002579,
+  "completedAt": 1790026013413,
+  "output": {
+    "qualified": [],
+    "adjacent": [],
+    "review": [
+      "USDOT 378608, CIOFFI TOWING SERVICE INC — active, for-hire, 15 drivers/17 power units, intermodal cargo flag, drayage op probability 0.93. Failed the port-oriented location check (no; 0.67), despite safety signals worth noting: not rated, 3 crashes in 24 months, unsafe driving rank 71, vehicle maintenance rank 40.\n\nQuestion: is Cherry Hill a genuine drayage base serving Philadelphia/New York ports, or a tow operation misclassified?"
+    ]
+  },
+  "nodes": [
+    {
+      "nodeId": "input",
+      "nodeType": "input",
+      "label": "Carrier record",
+      "status": "complete",
+      "parentNodeIds": [],
+      "input": "USDOT 378608 — CIOFFI TOWING SERVICE INC\nDBA: —\nPhysical address: CHERRY HILL, NJ 08034\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 15   Power units: 17\nCargo flags: crgo_intermodal\nSafety rating: not rated\nSMS measures, with PortPro population rank (share of the peer population scored\nstrictly above; higher is worse):\n  unsafe_driv          3.12   rank 71\n  hos_driv                0   rank 0\n  veh_maint            3.94   rank 40\n  driv_fit              .22   rank 67\n  contr_subst             0   rank 0\nBASIC alerts: none\nCrashes 24mo: 3   Hazmat violations 24mo: 0",
+      "output": "USDOT 378608 — CIOFFI TOWING SERVICE INC\nDBA: —\nPhysical address: CHERRY HILL, NJ 08034\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 15   Power units: 17\nCargo flags: crgo_intermodal\nSafety rating: not rated\nSMS measures, with PortPro population rank (share of the peer population scored\nstrictly above; higher is worse):\n  unsafe_driv          3.12   rank 71\n  hos_driv                0   rank 0\n  veh_maint            3.94   rank 40\n  driv_fit              .22   rank 67\n  contr_subst             0   rank 0\nBASIC alerts: none\nCrashes 24mo: 3   Hazmat violations 24mo: 0",
+      "firedHandles": [
+        "out"
+      ],
+      "durationMs": 0,
+      "startedAt": 1790026004070
+    },
+    {
+      "nodeId": "jev-drayage",
+      "nodeType": "jev",
+      "label": "Drayage qualification",
+      "status": "complete",
+      "parentNodeIds": [
+        "input"
+      ],
+      "activation": "any",
+      "input": "USDOT 378608 — CIOFFI TOWING SERVICE INC\nDBA: —\nPhysical address: CHERRY HILL, NJ 08034\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 15   Power units: 17\nCargo flags: crgo_intermodal\nSafety rating: not rated\nSMS measures, with PortPro population rank (share of the peer population scored\nstrictly above; higher is worse):\n  unsafe_driv          3.12   rank 71\n  hos_driv                0   rank 0\n  veh_maint            3.94   rank 40\n  driv_fit              .22   rank 67\n  contr_subst             0   rank 0\nBASIC alerts: none\nCrashes 24mo: 3   Hazmat violations 24mo: 0",
+      "startedAt": 1790026004856,
+      "output": "USDOT 378608 — CIOFFI TOWING SERVICE INC\nDBA: —\nPhysical address: CHERRY HILL, NJ 08034\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 15   Power units: 17\nCargo flags: crgo_intermodal\nSafety rating: not rated\nSMS measures, with PortPro population rank (share of the peer population scored\nstrictly above; higher is worse):\n  unsafe_driv          3.12   rank 71\n  hos_driv                0   rank 0\n  veh_maint            3.94   rank 40\n  driv_fit              .22   rank 67\n  contr_subst             0   rank 0\nBASIC alerts: none\nCrashes 24mo: 3   Hazmat violations 24mo: 0",
+      "answers": {
+        "operation": {
+          "type": "choice",
+          "choice": "drayage_intermodal",
+          "confidence": 0.9,
+          "probabilities": {
+            "drayage_intermodal": 0.93,
+            "not_a_carrier": 0,
+            "other_trucking": 0.07,
+            "passenger_or_household": 0
+          }
+        },
+        "port_oriented": {
+          "type": "noul",
+          "noul": 0.67,
+          "threshold": 0.7
+        },
+        "size_profile": {
+          "type": "noul",
+          "noul": 0.83,
+          "threshold": 0.65
+        },
+        "risk_profile": {
+          "type": "noul",
+          "noul": 0.8,
+          "threshold": 0.6
+        }
+      },
+      "firedHandles": [
+        "any",
+        "q:operation:drayage_intermodal",
+        "q:port_oriented:no",
+        "q:size_profile:yes",
+        "q:risk_profile:yes"
+      ],
+      "mock": false,
+      "model": "jev-1.13.0",
+      "durationMs": 1240
+    },
+    {
+      "nodeId": "llm-review",
+      "nodeType": "llm",
+      "label": "Review note",
+      "status": "complete",
+      "parentNodeIds": [
+        "jev-drayage"
+      ],
+      "activation": "any",
+      "input": "USDOT 378608 — CIOFFI TOWING SERVICE INC\nDBA: —\nPhysical address: CHERRY HILL, NJ 08034\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 15   Power units: 17\nCargo flags: crgo_intermodal\nSafety rating: not rated\nSMS measures, with PortPro population rank (share of the peer population scored\nstrictly above; higher is worse):\n  unsafe_driv          3.12   rank 71\n  hos_driv                0   rank 0\n  veh_maint            3.94   rank 40\n  driv_fit              .22   rank 67\n  contr_subst             0   rank 0\nBASIC alerts: none\nCrashes 24mo: 3   Hazmat violations 24mo: 0",
+      "startedAt": 1790026006335,
+      "output": "USDOT 378608, CIOFFI TOWING SERVICE INC — active, for-hire, 15 drivers/17 power units, intermodal cargo flag, drayage op probability 0.93. Failed the port-oriented location check (no; 0.67), despite safety signals worth noting: not rated, 3 crashes in 24 months, unsafe driving rank 71, vehicle maintenance rank 40.\n\nQuestion: is Cherry Hill a genuine drayage base serving Philadelphia/New York ports, or a tow operation misclassified?",
+      "firedHandles": [
+        "out"
+      ],
+      "mock": false,
+      "model": "deepseek-v4.1-flash",
+      "durationMs": 5970
+    },
+    {
+      "nodeId": "output",
+      "nodeType": "output",
+      "label": "Output",
+      "status": "complete",
+      "parentNodeIds": [
+        "llm-review"
+      ],
+      "activation": "any",
+      "input": "USDOT 378608, CIOFFI TOWING SERVICE INC — active, for-hire, 15 drivers/17 power units, intermodal cargo flag, drayage op probability 0.93. Failed the port-oriented location check (no; 0.67), despite safety signals worth noting: not rated, 3 crashes in 24 months, unsafe driving rank 71, vehicle maintenance rank 40.\n\nQuestion: is Cherry Hill a genuine drayage base serving Philadelphia/New York ports, or a tow operation misclassified?",
+      "startedAt": 1790026012895,
+      "output": "USDOT 378608, CIOFFI TOWING SERVICE INC — active, for-hire, 15 drivers/17 power units, intermodal cargo flag, drayage op probability 0.93. Failed the port-oriented location check (no; 0.67), despite safety signals worth noting: not rated, 3 crashes in 24 months, unsafe driving rank 71, vehicle maintenance rank 40.\n\nQuestion: is Cherry Hill a genuine drayage base serving Philadelphia/New York ports, or a tow operation misclassified?",
+      "outputs": {
+        "qualified": [],
+        "adjacent": [],
+        "review": [
+          "USDOT 378608, CIOFFI TOWING SERVICE INC — active, for-hire, 15 drivers/17 power units, intermodal cargo flag, drayage op probability 0.93. Failed the port-oriented location check (no; 0.67), despite safety signals worth noting: not rated, 3 crashes in 24 months, unsafe driving rank 71, vehicle maintenance rank 40.\n\nQuestion: is Cherry Hill a genuine drayage base serving Philadelphia/New York ports, or a tow operation misclassified?"
+        ]
+      },
+      "firedHandles": [],
+      "durationMs": 274
+    }
+  ]
+}

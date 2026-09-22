@@ -1,0 +1,123 @@
+{
+  "runId": "run--HYPi-NI_6",
+  "status": "complete",
+  "trigger": "api",
+  "input": "USDOT 298012 — JUNELL CORP\nDBA: ADVANCED LUBRICATION SPECIALTIES\nPhysical address: WATERLOO, NY 13165\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 4   Power units: 9\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS: only 1 inspections, below the 5-inspection floor for ranking\nBASIC alerts: none\nCrashes 24mo: 0   Hazmat violations 24mo: 0",
+  "startedAt": 1790025920578,
+  "completedAt": 1790025929663,
+  "output": {
+    "qualified": [],
+    "adjacent": [],
+    "review": [
+      "USDOT 298012 is a small active for-hire carrier with an intermodal cargo flag, 9 power units, no crashes/hazmat, and too few inspections for SMS ranking. It failed the drayage screen on port-oriented location (0.06) and risk-profile fit (0.25); operation classifier and fleet-size fit passed. Human question: Is there verifiable port drayage activity, or is the intermodal flag incidental?"
+    ]
+  },
+  "nodes": [
+    {
+      "nodeId": "input",
+      "nodeType": "input",
+      "label": "Carrier record",
+      "status": "complete",
+      "parentNodeIds": [],
+      "input": "USDOT 298012 — JUNELL CORP\nDBA: ADVANCED LUBRICATION SPECIALTIES\nPhysical address: WATERLOO, NY 13165\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 4   Power units: 9\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS: only 1 inspections, below the 5-inspection floor for ranking\nBASIC alerts: none\nCrashes 24mo: 0   Hazmat violations 24mo: 0",
+      "output": "USDOT 298012 — JUNELL CORP\nDBA: ADVANCED LUBRICATION SPECIALTIES\nPhysical address: WATERLOO, NY 13165\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 4   Power units: 9\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS: only 1 inspections, below the 5-inspection floor for ranking\nBASIC alerts: none\nCrashes 24mo: 0   Hazmat violations 24mo: 0",
+      "firedHandles": [
+        "out"
+      ],
+      "durationMs": 0,
+      "startedAt": 1790025921035
+    },
+    {
+      "nodeId": "jev-drayage",
+      "nodeType": "jev",
+      "label": "Drayage qualification",
+      "status": "complete",
+      "parentNodeIds": [
+        "input"
+      ],
+      "activation": "any",
+      "input": "USDOT 298012 — JUNELL CORP\nDBA: ADVANCED LUBRICATION SPECIALTIES\nPhysical address: WATERLOO, NY 13165\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 4   Power units: 9\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS: only 1 inspections, below the 5-inspection floor for ranking\nBASIC alerts: none\nCrashes 24mo: 0   Hazmat violations 24mo: 0",
+      "startedAt": 1790025921330,
+      "output": "USDOT 298012 — JUNELL CORP\nDBA: ADVANCED LUBRICATION SPECIALTIES\nPhysical address: WATERLOO, NY 13165\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 4   Power units: 9\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS: only 1 inspections, below the 5-inspection floor for ranking\nBASIC alerts: none\nCrashes 24mo: 0   Hazmat violations 24mo: 0",
+      "answers": {
+        "operation": {
+          "type": "choice",
+          "choice": "drayage_intermodal",
+          "confidence": 0.79,
+          "probabilities": {
+            "not_a_carrier": 0,
+            "other_trucking": 0.15,
+            "drayage_intermodal": 0.85,
+            "passenger_or_household": 0
+          }
+        },
+        "port_oriented": {
+          "type": "noul",
+          "noul": 0.06,
+          "threshold": 0.7
+        },
+        "size_profile": {
+          "type": "noul",
+          "noul": 0.77,
+          "threshold": 0.65
+        },
+        "risk_profile": {
+          "type": "noul",
+          "noul": 0.25,
+          "threshold": 0.6
+        }
+      },
+      "firedHandles": [
+        "any",
+        "q:operation:drayage_intermodal",
+        "q:port_oriented:no",
+        "q:size_profile:yes",
+        "q:risk_profile:no"
+      ],
+      "mock": false,
+      "model": "jev-1.13.0",
+      "durationMs": 1244
+    },
+    {
+      "nodeId": "llm-review",
+      "nodeType": "llm",
+      "label": "Review note",
+      "status": "complete",
+      "parentNodeIds": [
+        "jev-drayage"
+      ],
+      "activation": "any",
+      "input": "USDOT 298012 — JUNELL CORP\nDBA: ADVANCED LUBRICATION SPECIALTIES\nPhysical address: WATERLOO, NY 13165\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 4   Power units: 9\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS: only 1 inspections, below the 5-inspection floor for ranking\nBASIC alerts: none\nCrashes 24mo: 0   Hazmat violations 24mo: 0",
+      "startedAt": 1790025922814,
+      "output": "USDOT 298012 is a small active for-hire carrier with an intermodal cargo flag, 9 power units, no crashes/hazmat, and too few inspections for SMS ranking. It failed the drayage screen on port-oriented location (0.06) and risk-profile fit (0.25); operation classifier and fleet-size fit passed. Human question: Is there verifiable port drayage activity, or is the intermodal flag incidental?",
+      "firedHandles": [
+        "out"
+      ],
+      "mock": false,
+      "model": "deepseek-v4.1-flash",
+      "durationMs": 6148
+    },
+    {
+      "nodeId": "output",
+      "nodeType": "output",
+      "label": "Output",
+      "status": "complete",
+      "parentNodeIds": [
+        "llm-review"
+      ],
+      "activation": "any",
+      "input": "USDOT 298012 is a small active for-hire carrier with an intermodal cargo flag, 9 power units, no crashes/hazmat, and too few inspections for SMS ranking. It failed the drayage screen on port-oriented location (0.06) and risk-profile fit (0.25); operation classifier and fleet-size fit passed. Human question: Is there verifiable port drayage activity, or is the intermodal flag incidental?",
+      "startedAt": 1790025929206,
+      "output": "USDOT 298012 is a small active for-hire carrier with an intermodal cargo flag, 9 power units, no crashes/hazmat, and too few inspections for SMS ranking. It failed the drayage screen on port-oriented location (0.06) and risk-profile fit (0.25); operation classifier and fleet-size fit passed. Human question: Is there verifiable port drayage activity, or is the intermodal flag incidental?",
+      "outputs": {
+        "qualified": [],
+        "adjacent": [],
+        "review": [
+          "USDOT 298012 is a small active for-hire carrier with an intermodal cargo flag, 9 power units, no crashes/hazmat, and too few inspections for SMS ranking. It failed the drayage screen on port-oriented location (0.06) and risk-profile fit (0.25); operation classifier and fleet-size fit passed. Human question: Is there verifiable port drayage activity, or is the intermodal flag incidental?"
+        ]
+      },
+      "firedHandles": [],
+      "durationMs": 239
+    }
+  ]
+}

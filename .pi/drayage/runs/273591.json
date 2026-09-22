@@ -1,0 +1,123 @@
+{
+  "runId": "run-W2MLz0yKvX",
+  "status": "complete",
+  "trigger": "api",
+  "input": "USDOT 273591 — RUSINIAK'S SERVICE INC\nDBA: —\nPhysical address: CHEEKTOWAGA, NY 14227\nClassdef: PRIVATE PROPERTY;AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 18   Power units: 17\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS measures, with PortPro population rank (share of the peer population scored\nstrictly above; higher is worse):\n  unsafe_driv          1.05   rank 53\n  hos_driv                0   rank 0\n  veh_maint            1.25   rank 16\n  driv_fit              .07   rank 61\n  contr_subst             0   rank 0\nBASIC alerts: none\nCrashes 24mo: 0   Hazmat violations 24mo: 0",
+  "startedAt": 1790025880556,
+  "completedAt": 1790025890371,
+  "output": {
+    "qualified": [],
+    "adjacent": [],
+    "review": [
+      "USDOT 273591 is an active Cheektowaga, NY for-hire/private intermodal carrier: 18 drivers, 17 power units, safety S, no crashes or hazmat. It failed drayage screen on port-oriented location (no, 0.36) and risk-profile fit (no, 0.55); operation (0.93) and fleet size (0.83) passed. Human question: Does verified drayage/port work outweigh the non-port address and risk mismatch?"
+    ]
+  },
+  "nodes": [
+    {
+      "nodeId": "input",
+      "nodeType": "input",
+      "label": "Carrier record",
+      "status": "complete",
+      "parentNodeIds": [],
+      "input": "USDOT 273591 — RUSINIAK'S SERVICE INC\nDBA: —\nPhysical address: CHEEKTOWAGA, NY 14227\nClassdef: PRIVATE PROPERTY;AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 18   Power units: 17\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS measures, with PortPro population rank (share of the peer population scored\nstrictly above; higher is worse):\n  unsafe_driv          1.05   rank 53\n  hos_driv                0   rank 0\n  veh_maint            1.25   rank 16\n  driv_fit              .07   rank 61\n  contr_subst             0   rank 0\nBASIC alerts: none\nCrashes 24mo: 0   Hazmat violations 24mo: 0",
+      "output": "USDOT 273591 — RUSINIAK'S SERVICE INC\nDBA: —\nPhysical address: CHEEKTOWAGA, NY 14227\nClassdef: PRIVATE PROPERTY;AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 18   Power units: 17\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS measures, with PortPro population rank (share of the peer population scored\nstrictly above; higher is worse):\n  unsafe_driv          1.05   rank 53\n  hos_driv                0   rank 0\n  veh_maint            1.25   rank 16\n  driv_fit              .07   rank 61\n  contr_subst             0   rank 0\nBASIC alerts: none\nCrashes 24mo: 0   Hazmat violations 24mo: 0",
+      "firedHandles": [
+        "out"
+      ],
+      "durationMs": 0,
+      "startedAt": 1790025881015
+    },
+    {
+      "nodeId": "jev-drayage",
+      "nodeType": "jev",
+      "label": "Drayage qualification",
+      "status": "complete",
+      "parentNodeIds": [
+        "input"
+      ],
+      "activation": "any",
+      "input": "USDOT 273591 — RUSINIAK'S SERVICE INC\nDBA: —\nPhysical address: CHEEKTOWAGA, NY 14227\nClassdef: PRIVATE PROPERTY;AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 18   Power units: 17\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS measures, with PortPro population rank (share of the peer population scored\nstrictly above; higher is worse):\n  unsafe_driv          1.05   rank 53\n  hos_driv                0   rank 0\n  veh_maint            1.25   rank 16\n  driv_fit              .07   rank 61\n  contr_subst             0   rank 0\nBASIC alerts: none\nCrashes 24mo: 0   Hazmat violations 24mo: 0",
+      "startedAt": 1790025881334,
+      "output": "USDOT 273591 — RUSINIAK'S SERVICE INC\nDBA: —\nPhysical address: CHEEKTOWAGA, NY 14227\nClassdef: PRIVATE PROPERTY;AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 18   Power units: 17\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS measures, with PortPro population rank (share of the peer population scored\nstrictly above; higher is worse):\n  unsafe_driv          1.05   rank 53\n  hos_driv                0   rank 0\n  veh_maint            1.25   rank 16\n  driv_fit              .07   rank 61\n  contr_subst             0   rank 0\nBASIC alerts: none\nCrashes 24mo: 0   Hazmat violations 24mo: 0",
+      "answers": {
+        "operation": {
+          "type": "choice",
+          "choice": "drayage_intermodal",
+          "confidence": 0.91,
+          "probabilities": {
+            "drayage_intermodal": 0.93,
+            "passenger_or_household": 0,
+            "other_trucking": 0.06,
+            "not_a_carrier": 0.01
+          }
+        },
+        "port_oriented": {
+          "type": "noul",
+          "noul": 0.36,
+          "threshold": 0.7
+        },
+        "size_profile": {
+          "type": "noul",
+          "noul": 0.83,
+          "threshold": 0.65
+        },
+        "risk_profile": {
+          "type": "noul",
+          "noul": 0.55,
+          "threshold": 0.6
+        }
+      },
+      "firedHandles": [
+        "any",
+        "q:operation:drayage_intermodal",
+        "q:port_oriented:no",
+        "q:size_profile:yes",
+        "q:risk_profile:no"
+      ],
+      "mock": false,
+      "model": "jev-1.13.0",
+      "durationMs": 1552
+    },
+    {
+      "nodeId": "llm-review",
+      "nodeType": "llm",
+      "label": "Review note",
+      "status": "complete",
+      "parentNodeIds": [
+        "jev-drayage"
+      ],
+      "activation": "any",
+      "input": "USDOT 273591 — RUSINIAK'S SERVICE INC\nDBA: —\nPhysical address: CHEEKTOWAGA, NY 14227\nClassdef: PRIVATE PROPERTY;AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 18   Power units: 17\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS measures, with PortPro population rank (share of the peer population scored\nstrictly above; higher is worse):\n  unsafe_driv          1.05   rank 53\n  hos_driv                0   rank 0\n  veh_maint            1.25   rank 16\n  driv_fit              .07   rank 61\n  contr_subst             0   rank 0\nBASIC alerts: none\nCrashes 24mo: 0   Hazmat violations 24mo: 0",
+      "startedAt": 1790025883111,
+      "output": "USDOT 273591 is an active Cheektowaga, NY for-hire/private intermodal carrier: 18 drivers, 17 power units, safety S, no crashes or hazmat. It failed drayage screen on port-oriented location (no, 0.36) and risk-profile fit (no, 0.55); operation (0.93) and fleet size (0.83) passed. Human question: Does verified drayage/port work outweigh the non-port address and risk mismatch?",
+      "firedHandles": [
+        "out"
+      ],
+      "mock": false,
+      "model": "deepseek-v4.1-flash",
+      "durationMs": 6543
+    },
+    {
+      "nodeId": "output",
+      "nodeType": "output",
+      "label": "Output",
+      "status": "complete",
+      "parentNodeIds": [
+        "llm-review"
+      ],
+      "activation": "any",
+      "input": "USDOT 273591 is an active Cheektowaga, NY for-hire/private intermodal carrier: 18 drivers, 17 power units, safety S, no crashes or hazmat. It failed drayage screen on port-oriented location (no, 0.36) and risk-profile fit (no, 0.55); operation (0.93) and fleet size (0.83) passed. Human question: Does verified drayage/port work outweigh the non-port address and risk mismatch?",
+      "startedAt": 1790025889869,
+      "output": "USDOT 273591 is an active Cheektowaga, NY for-hire/private intermodal carrier: 18 drivers, 17 power units, safety S, no crashes or hazmat. It failed drayage screen on port-oriented location (no, 0.36) and risk-profile fit (no, 0.55); operation (0.93) and fleet size (0.83) passed. Human question: Does verified drayage/port work outweigh the non-port address and risk mismatch?",
+      "outputs": {
+        "qualified": [],
+        "adjacent": [],
+        "review": [
+          "USDOT 273591 is an active Cheektowaga, NY for-hire/private intermodal carrier: 18 drivers, 17 power units, safety S, no crashes or hazmat. It failed drayage screen on port-oriented location (no, 0.36) and risk-profile fit (no, 0.55); operation (0.93) and fleet size (0.83) passed. Human question: Does verified drayage/port work outweigh the non-port address and risk mismatch?"
+        ]
+      },
+      "firedHandles": [],
+      "durationMs": 242
+    }
+  ]
+}

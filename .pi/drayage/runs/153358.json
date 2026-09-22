@@ -1,0 +1,123 @@
+{
+  "runId": "run-EfRusetLm9",
+  "status": "complete",
+  "trigger": "api",
+  "input": "USDOT 153358 — J SUPOR & SON TRUCKING & RIGGING CO INC\nDBA: —\nPhysical address: HARRISON, NJ 07029\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 10   Power units: 8\nCargo flags: crgo_intermodal\nSafety rating: C\nSMS measures, with PortPro population rank (share of the peer population scored\nstrictly above; higher is worse):\n  unsafe_driv           .66   rank 48\n  hos_driv              .11   rank 58\n  veh_maint             .51   rank 10\n  driv_fit              .14   rank 64\n  contr_subst             0   rank 0\nBASIC alerts: none\nCrashes 24mo: 0   Hazmat violations 24mo: 0",
+  "startedAt": 1790025715447,
+  "completedAt": 1790025726215,
+  "output": {
+    "qualified": [
+      "J Supor & Son (USDOT 153358) qualifies as a NY/NJ drayage target: Harrison, NJ sits in the Port of New York/New Jersey metro, its cargo flag is intermodal, and 10 drivers/8 power units fit small-fleet drayage. Strongest evidence: crgo_intermodal plus port-oriented location. Open by confirming current port drayage lanes and chassis/empty moves, then address the C safety rating by asking about HOS and driver-fit coaching—no crashes in 24 months is a good hook."
+    ],
+    "adjacent": [],
+    "review": []
+  },
+  "nodes": [
+    {
+      "nodeId": "input",
+      "nodeType": "input",
+      "label": "Carrier record",
+      "status": "complete",
+      "parentNodeIds": [],
+      "input": "USDOT 153358 — J SUPOR & SON TRUCKING & RIGGING CO INC\nDBA: —\nPhysical address: HARRISON, NJ 07029\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 10   Power units: 8\nCargo flags: crgo_intermodal\nSafety rating: C\nSMS measures, with PortPro population rank (share of the peer population scored\nstrictly above; higher is worse):\n  unsafe_driv           .66   rank 48\n  hos_driv              .11   rank 58\n  veh_maint             .51   rank 10\n  driv_fit              .14   rank 64\n  contr_subst             0   rank 0\nBASIC alerts: none\nCrashes 24mo: 0   Hazmat violations 24mo: 0",
+      "output": "USDOT 153358 — J SUPOR & SON TRUCKING & RIGGING CO INC\nDBA: —\nPhysical address: HARRISON, NJ 07029\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 10   Power units: 8\nCargo flags: crgo_intermodal\nSafety rating: C\nSMS measures, with PortPro population rank (share of the peer population scored\nstrictly above; higher is worse):\n  unsafe_driv           .66   rank 48\n  hos_driv              .11   rank 58\n  veh_maint             .51   rank 10\n  driv_fit              .14   rank 64\n  contr_subst             0   rank 0\nBASIC alerts: none\nCrashes 24mo: 0   Hazmat violations 24mo: 0",
+      "firedHandles": [
+        "out"
+      ],
+      "durationMs": 0,
+      "startedAt": 1790025715945
+    },
+    {
+      "nodeId": "jev-drayage",
+      "nodeType": "jev",
+      "label": "Drayage qualification",
+      "status": "complete",
+      "parentNodeIds": [
+        "input"
+      ],
+      "activation": "any",
+      "input": "USDOT 153358 — J SUPOR & SON TRUCKING & RIGGING CO INC\nDBA: —\nPhysical address: HARRISON, NJ 07029\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 10   Power units: 8\nCargo flags: crgo_intermodal\nSafety rating: C\nSMS measures, with PortPro population rank (share of the peer population scored\nstrictly above; higher is worse):\n  unsafe_driv           .66   rank 48\n  hos_driv              .11   rank 58\n  veh_maint             .51   rank 10\n  driv_fit              .14   rank 64\n  contr_subst             0   rank 0\nBASIC alerts: none\nCrashes 24mo: 0   Hazmat violations 24mo: 0",
+      "startedAt": 1790025716521,
+      "output": "USDOT 153358 — J SUPOR & SON TRUCKING & RIGGING CO INC\nDBA: —\nPhysical address: HARRISON, NJ 07029\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 10   Power units: 8\nCargo flags: crgo_intermodal\nSafety rating: C\nSMS measures, with PortPro population rank (share of the peer population scored\nstrictly above; higher is worse):\n  unsafe_driv           .66   rank 48\n  hos_driv              .11   rank 58\n  veh_maint             .51   rank 10\n  driv_fit              .14   rank 64\n  contr_subst             0   rank 0\nBASIC alerts: none\nCrashes 24mo: 0   Hazmat violations 24mo: 0",
+      "answers": {
+        "operation": {
+          "type": "choice",
+          "choice": "drayage_intermodal",
+          "confidence": 0.84,
+          "probabilities": {
+            "passenger_or_household": 0,
+            "other_trucking": 0.12,
+            "drayage_intermodal": 0.88,
+            "not_a_carrier": 0
+          }
+        },
+        "port_oriented": {
+          "type": "noul",
+          "noul": 0.97,
+          "threshold": 0.7
+        },
+        "size_profile": {
+          "type": "noul",
+          "noul": 0.86,
+          "threshold": 0.65
+        },
+        "risk_profile": {
+          "type": "noul",
+          "noul": 0.69,
+          "threshold": 0.6
+        }
+      },
+      "firedHandles": [
+        "any",
+        "q:operation:drayage_intermodal",
+        "q:port_oriented:yes",
+        "q:size_profile:yes",
+        "q:risk_profile:yes"
+      ],
+      "mock": false,
+      "model": "jev-1.13.0",
+      "durationMs": 1276
+    },
+    {
+      "nodeId": "llm-qualified",
+      "nodeType": "llm",
+      "label": "Drayage qualification note",
+      "status": "complete",
+      "parentNodeIds": [
+        "jev-drayage"
+      ],
+      "activation": "all",
+      "input": "USDOT 153358 — J SUPOR & SON TRUCKING & RIGGING CO INC\nDBA: —\nPhysical address: HARRISON, NJ 07029\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 10   Power units: 8\nCargo flags: crgo_intermodal\nSafety rating: C\nSMS measures, with PortPro population rank (share of the peer population scored\nstrictly above; higher is worse):\n  unsafe_driv           .66   rank 48\n  hos_driv              .11   rank 58\n  veh_maint             .51   rank 10\n  driv_fit              .14   rank 64\n  contr_subst             0   rank 0\nBASIC alerts: none\nCrashes 24mo: 0   Hazmat violations 24mo: 0",
+      "startedAt": 1790025718044,
+      "output": "J Supor & Son (USDOT 153358) qualifies as a NY/NJ drayage target: Harrison, NJ sits in the Port of New York/New Jersey metro, its cargo flag is intermodal, and 10 drivers/8 power units fit small-fleet drayage. Strongest evidence: crgo_intermodal plus port-oriented location. Open by confirming current port drayage lanes and chassis/empty moves, then address the C safety rating by asking about HOS and driver-fit coaching—no crashes in 24 months is a good hook.",
+      "firedHandles": [
+        "out"
+      ],
+      "mock": false,
+      "model": "deepseek-v4.1-flash",
+      "durationMs": 7470
+    },
+    {
+      "nodeId": "output",
+      "nodeType": "output",
+      "label": "Output",
+      "status": "complete",
+      "parentNodeIds": [
+        "llm-qualified"
+      ],
+      "activation": "any",
+      "input": "J Supor & Son (USDOT 153358) qualifies as a NY/NJ drayage target: Harrison, NJ sits in the Port of New York/New Jersey metro, its cargo flag is intermodal, and 10 drivers/8 power units fit small-fleet drayage. Strongest evidence: crgo_intermodal plus port-oriented location. Open by confirming current port drayage lanes and chassis/empty moves, then address the C safety rating by asking about HOS and driver-fit coaching—no crashes in 24 months is a good hook.",
+      "startedAt": 1790025725746,
+      "output": "J Supor & Son (USDOT 153358) qualifies as a NY/NJ drayage target: Harrison, NJ sits in the Port of New York/New Jersey metro, its cargo flag is intermodal, and 10 drivers/8 power units fit small-fleet drayage. Strongest evidence: crgo_intermodal plus port-oriented location. Open by confirming current port drayage lanes and chassis/empty moves, then address the C safety rating by asking about HOS and driver-fit coaching—no crashes in 24 months is a good hook.",
+      "outputs": {
+        "qualified": [
+          "J Supor & Son (USDOT 153358) qualifies as a NY/NJ drayage target: Harrison, NJ sits in the Port of New York/New Jersey metro, its cargo flag is intermodal, and 10 drivers/8 power units fit small-fleet drayage. Strongest evidence: crgo_intermodal plus port-oriented location. Open by confirming current port drayage lanes and chassis/empty moves, then address the C safety rating by asking about HOS and driver-fit coaching—no crashes in 24 months is a good hook."
+        ],
+        "adjacent": [],
+        "review": []
+      },
+      "firedHandles": [],
+      "durationMs": 242
+    }
+  ]
+}

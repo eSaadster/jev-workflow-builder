@@ -1,0 +1,123 @@
+{
+  "runId": "run-B5Yw3V6I-G",
+  "status": "complete",
+  "trigger": "api",
+  "input": "USDOT 350010 — TREZZCO TRUCKING INC\nDBA: —\nPhysical address: CRANFORD, NJ 07016\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 6   Power units: 6\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS: only 3 inspections, below the 5-inspection floor for ranking\nBASIC alerts: none\nCrashes 24mo: 0   Hazmat violations 24mo: 0",
+  "startedAt": 1790025988617,
+  "completedAt": 1790026001216,
+  "output": {
+    "qualified": [],
+    "adjacent": [],
+    "review": [
+      "TREZZCO TRUCKING INC (USDOT 350010) is an active, for-hire intermodal drayage carrier in Cranford, NJ, with 6 drivers and 6 power units; cargo flag crgo_intermodal, no crashes or hazmat violations.\n\nIt failed the risk-profile fit check (0.23): too few inspections (3, below the 5-inspection SMS floor) to rank safety, with no BASIC alerts.\n\nHuman question: Does no rankable safety history mean low risk, or simply insufficient data?"
+    ]
+  },
+  "nodes": [
+    {
+      "nodeId": "input",
+      "nodeType": "input",
+      "label": "Carrier record",
+      "status": "complete",
+      "parentNodeIds": [],
+      "input": "USDOT 350010 — TREZZCO TRUCKING INC\nDBA: —\nPhysical address: CRANFORD, NJ 07016\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 6   Power units: 6\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS: only 3 inspections, below the 5-inspection floor for ranking\nBASIC alerts: none\nCrashes 24mo: 0   Hazmat violations 24mo: 0",
+      "output": "USDOT 350010 — TREZZCO TRUCKING INC\nDBA: —\nPhysical address: CRANFORD, NJ 07016\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 6   Power units: 6\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS: only 3 inspections, below the 5-inspection floor for ranking\nBASIC alerts: none\nCrashes 24mo: 0   Hazmat violations 24mo: 0",
+      "firedHandles": [
+        "out"
+      ],
+      "durationMs": 0,
+      "startedAt": 1790025989074
+    },
+    {
+      "nodeId": "jev-drayage",
+      "nodeType": "jev",
+      "label": "Drayage qualification",
+      "status": "complete",
+      "parentNodeIds": [
+        "input"
+      ],
+      "activation": "any",
+      "input": "USDOT 350010 — TREZZCO TRUCKING INC\nDBA: —\nPhysical address: CRANFORD, NJ 07016\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 6   Power units: 6\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS: only 3 inspections, below the 5-inspection floor for ranking\nBASIC alerts: none\nCrashes 24mo: 0   Hazmat violations 24mo: 0",
+      "startedAt": 1790025991130,
+      "output": "USDOT 350010 — TREZZCO TRUCKING INC\nDBA: —\nPhysical address: CRANFORD, NJ 07016\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 6   Power units: 6\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS: only 3 inspections, below the 5-inspection floor for ranking\nBASIC alerts: none\nCrashes 24mo: 0   Hazmat violations 24mo: 0",
+      "answers": {
+        "operation": {
+          "type": "choice",
+          "choice": "drayage_intermodal",
+          "confidence": 0.9,
+          "probabilities": {
+            "not_a_carrier": 0,
+            "drayage_intermodal": 0.92,
+            "other_trucking": 0.08,
+            "passenger_or_household": 0
+          }
+        },
+        "port_oriented": {
+          "type": "noul",
+          "noul": 0.93,
+          "threshold": 0.7
+        },
+        "size_profile": {
+          "type": "noul",
+          "noul": 0.83,
+          "threshold": 0.65
+        },
+        "risk_profile": {
+          "type": "noul",
+          "noul": 0.23,
+          "threshold": 0.6
+        }
+      },
+      "firedHandles": [
+        "any",
+        "q:operation:drayage_intermodal",
+        "q:port_oriented:yes",
+        "q:size_profile:yes",
+        "q:risk_profile:no"
+      ],
+      "mock": false,
+      "model": "jev-1.13.0",
+      "durationMs": 5698
+    },
+    {
+      "nodeId": "llm-review",
+      "nodeType": "llm",
+      "label": "Review note",
+      "status": "complete",
+      "parentNodeIds": [
+        "jev-drayage"
+      ],
+      "activation": "any",
+      "input": "USDOT 350010 — TREZZCO TRUCKING INC\nDBA: —\nPhysical address: CRANFORD, NJ 07016\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 6   Power units: 6\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS: only 3 inspections, below the 5-inspection floor for ranking\nBASIC alerts: none\nCrashes 24mo: 0   Hazmat violations 24mo: 0",
+      "startedAt": 1790025997134,
+      "output": "TREZZCO TRUCKING INC (USDOT 350010) is an active, for-hire intermodal drayage carrier in Cranford, NJ, with 6 drivers and 6 power units; cargo flag crgo_intermodal, no crashes or hazmat violations.\n\nIt failed the risk-profile fit check (0.23): too few inspections (3, below the 5-inspection SMS floor) to rank safety, with no BASIC alerts.\n\nHuman question: Does no rankable safety history mean low risk, or simply insufficient data?",
+      "firedHandles": [
+        "out"
+      ],
+      "mock": false,
+      "model": "deepseek-v4.1-flash",
+      "durationMs": 3365
+    },
+    {
+      "nodeId": "output",
+      "nodeType": "output",
+      "label": "Output",
+      "status": "complete",
+      "parentNodeIds": [
+        "llm-review"
+      ],
+      "activation": "any",
+      "input": "TREZZCO TRUCKING INC (USDOT 350010) is an active, for-hire intermodal drayage carrier in Cranford, NJ, with 6 drivers and 6 power units; cargo flag crgo_intermodal, no crashes or hazmat violations.\n\nIt failed the risk-profile fit check (0.23): too few inspections (3, below the 5-inspection SMS floor) to rank safety, with no BASIC alerts.\n\nHuman question: Does no rankable safety history mean low risk, or simply insufficient data?",
+      "startedAt": 1790026000741,
+      "output": "TREZZCO TRUCKING INC (USDOT 350010) is an active, for-hire intermodal drayage carrier in Cranford, NJ, with 6 drivers and 6 power units; cargo flag crgo_intermodal, no crashes or hazmat violations.\n\nIt failed the risk-profile fit check (0.23): too few inspections (3, below the 5-inspection SMS floor) to rank safety, with no BASIC alerts.\n\nHuman question: Does no rankable safety history mean low risk, or simply insufficient data?",
+      "outputs": {
+        "qualified": [],
+        "adjacent": [],
+        "review": [
+          "TREZZCO TRUCKING INC (USDOT 350010) is an active, for-hire intermodal drayage carrier in Cranford, NJ, with 6 drivers and 6 power units; cargo flag crgo_intermodal, no crashes or hazmat violations.\n\nIt failed the risk-profile fit check (0.23): too few inspections (3, below the 5-inspection SMS floor) to rank safety, with no BASIC alerts.\n\nHuman question: Does no rankable safety history mean low risk, or simply insufficient data?"
+        ]
+      },
+      "firedHandles": [],
+      "durationMs": 229
+    }
+  ]
+}

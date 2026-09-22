@@ -1,0 +1,123 @@
+{
+  "runId": "run-ScAc-kR9_g",
+  "status": "complete",
+  "trigger": "api",
+  "input": "USDOT 138970 — SEA TRANSFER CORPORATION\nDBA: —\nPhysical address: SECAUCUS, NJ 07094\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 7   Power units: 8\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS measures, with PortPro population rank (share of the peer population scored\nstrictly above; higher is worse):\n  unsafe_driv          1.38   rank 57\n  hos_driv                0   rank 0\n  veh_maint           11.42   rank 82\n  driv_fit                0   rank 0\n  contr_subst             0   rank 0\nBASIC alerts: none\nCrashes 24mo: 1   Hazmat violations 24mo: 0",
+  "startedAt": 1790025690998,
+  "completedAt": 1790025705401,
+  "output": {
+    "qualified": [
+      "Sea Transfer Corp (USDOT 138970) qualifies as a drayage target: active, for-hire, 7 drivers/8 power units, intermodal cargo, and classified drayage_intermodal at 1.00, the strongest evidence. Matched port metro: New York/New Jersey; Secaucus address and port-oriented flag support it. Open by confirming NY/NJ port capacity and current intermodal lanes, then qualify vehicle maintenance (SMS rank 82) despite clean alerts."
+    ],
+    "adjacent": [],
+    "review": []
+  },
+  "nodes": [
+    {
+      "nodeId": "input",
+      "nodeType": "input",
+      "label": "Carrier record",
+      "status": "complete",
+      "parentNodeIds": [],
+      "input": "USDOT 138970 — SEA TRANSFER CORPORATION\nDBA: —\nPhysical address: SECAUCUS, NJ 07094\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 7   Power units: 8\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS measures, with PortPro population rank (share of the peer population scored\nstrictly above; higher is worse):\n  unsafe_driv          1.38   rank 57\n  hos_driv                0   rank 0\n  veh_maint           11.42   rank 82\n  driv_fit                0   rank 0\n  contr_subst             0   rank 0\nBASIC alerts: none\nCrashes 24mo: 1   Hazmat violations 24mo: 0",
+      "output": "USDOT 138970 — SEA TRANSFER CORPORATION\nDBA: —\nPhysical address: SECAUCUS, NJ 07094\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 7   Power units: 8\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS measures, with PortPro population rank (share of the peer population scored\nstrictly above; higher is worse):\n  unsafe_driv          1.38   rank 57\n  hos_driv                0   rank 0\n  veh_maint           11.42   rank 82\n  driv_fit                0   rank 0\n  contr_subst             0   rank 0\nBASIC alerts: none\nCrashes 24mo: 1   Hazmat violations 24mo: 0",
+      "firedHandles": [
+        "out"
+      ],
+      "durationMs": 0,
+      "startedAt": 1790025691581
+    },
+    {
+      "nodeId": "jev-drayage",
+      "nodeType": "jev",
+      "label": "Drayage qualification",
+      "status": "complete",
+      "parentNodeIds": [
+        "input"
+      ],
+      "activation": "any",
+      "input": "USDOT 138970 — SEA TRANSFER CORPORATION\nDBA: —\nPhysical address: SECAUCUS, NJ 07094\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 7   Power units: 8\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS measures, with PortPro population rank (share of the peer population scored\nstrictly above; higher is worse):\n  unsafe_driv          1.38   rank 57\n  hos_driv                0   rank 0\n  veh_maint           11.42   rank 82\n  driv_fit                0   rank 0\n  contr_subst             0   rank 0\nBASIC alerts: none\nCrashes 24mo: 1   Hazmat violations 24mo: 0",
+      "startedAt": 1790025691910,
+      "output": "USDOT 138970 — SEA TRANSFER CORPORATION\nDBA: —\nPhysical address: SECAUCUS, NJ 07094\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 7   Power units: 8\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS measures, with PortPro population rank (share of the peer population scored\nstrictly above; higher is worse):\n  unsafe_driv          1.38   rank 57\n  hos_driv                0   rank 0\n  veh_maint           11.42   rank 82\n  driv_fit                0   rank 0\n  contr_subst             0   rank 0\nBASIC alerts: none\nCrashes 24mo: 1   Hazmat violations 24mo: 0",
+      "answers": {
+        "operation": {
+          "type": "choice",
+          "choice": "drayage_intermodal",
+          "confidence": 0.99,
+          "probabilities": {
+            "passenger_or_household": 0,
+            "other_trucking": 0,
+            "not_a_carrier": 0,
+            "drayage_intermodal": 1
+          }
+        },
+        "port_oriented": {
+          "type": "noul",
+          "noul": 0.96,
+          "threshold": 0.7
+        },
+        "size_profile": {
+          "type": "noul",
+          "noul": 0.85,
+          "threshold": 0.65
+        },
+        "risk_profile": {
+          "type": "noul",
+          "noul": 0.64,
+          "threshold": 0.6
+        }
+      },
+      "firedHandles": [
+        "any",
+        "q:operation:drayage_intermodal",
+        "q:port_oriented:yes",
+        "q:size_profile:yes",
+        "q:risk_profile:yes"
+      ],
+      "mock": false,
+      "model": "jev-1.13.0",
+      "durationMs": 1284
+    },
+    {
+      "nodeId": "llm-qualified",
+      "nodeType": "llm",
+      "label": "Drayage qualification note",
+      "status": "complete",
+      "parentNodeIds": [
+        "jev-drayage"
+      ],
+      "activation": "all",
+      "input": "USDOT 138970 — SEA TRANSFER CORPORATION\nDBA: —\nPhysical address: SECAUCUS, NJ 07094\nClassdef: AUTHORIZED FOR HIRE\nStatus: Active\nDrivers: 7   Power units: 8\nCargo flags: crgo_intermodal\nSafety rating: S\nSMS measures, with PortPro population rank (share of the peer population scored\nstrictly above; higher is worse):\n  unsafe_driv          1.38   rank 57\n  hos_driv                0   rank 0\n  veh_maint           11.42   rank 82\n  driv_fit                0   rank 0\n  contr_subst             0   rank 0\nBASIC alerts: none\nCrashes 24mo: 1   Hazmat violations 24mo: 0",
+      "startedAt": 1790025693845,
+      "output": "Sea Transfer Corp (USDOT 138970) qualifies as a drayage target: active, for-hire, 7 drivers/8 power units, intermodal cargo, and classified drayage_intermodal at 1.00, the strongest evidence. Matched port metro: New York/New Jersey; Secaucus address and port-oriented flag support it. Open by confirming NY/NJ port capacity and current intermodal lanes, then qualify vehicle maintenance (SMS rank 82) despite clean alerts.",
+      "firedHandles": [
+        "out"
+      ],
+      "mock": false,
+      "model": "deepseek-v4.1-flash",
+      "durationMs": 10826
+    },
+    {
+      "nodeId": "output",
+      "nodeType": "output",
+      "label": "Output",
+      "status": "complete",
+      "parentNodeIds": [
+        "llm-qualified"
+      ],
+      "activation": "any",
+      "input": "Sea Transfer Corp (USDOT 138970) qualifies as a drayage target: active, for-hire, 7 drivers/8 power units, intermodal cargo, and classified drayage_intermodal at 1.00, the strongest evidence. Matched port metro: New York/New Jersey; Secaucus address and port-oriented flag support it. Open by confirming NY/NJ port capacity and current intermodal lanes, then qualify vehicle maintenance (SMS rank 82) despite clean alerts.",
+      "startedAt": 1790025704904,
+      "output": "Sea Transfer Corp (USDOT 138970) qualifies as a drayage target: active, for-hire, 7 drivers/8 power units, intermodal cargo, and classified drayage_intermodal at 1.00, the strongest evidence. Matched port metro: New York/New Jersey; Secaucus address and port-oriented flag support it. Open by confirming NY/NJ port capacity and current intermodal lanes, then qualify vehicle maintenance (SMS rank 82) despite clean alerts.",
+      "outputs": {
+        "qualified": [
+          "Sea Transfer Corp (USDOT 138970) qualifies as a drayage target: active, for-hire, 7 drivers/8 power units, intermodal cargo, and classified drayage_intermodal at 1.00, the strongest evidence. Matched port metro: New York/New Jersey; Secaucus address and port-oriented flag support it. Open by confirming NY/NJ port capacity and current intermodal lanes, then qualify vehicle maintenance (SMS rank 82) despite clean alerts."
+        ],
+        "adjacent": [],
+        "review": []
+      },
+      "firedHandles": [],
+      "durationMs": 247
+    }
+  ]
+}

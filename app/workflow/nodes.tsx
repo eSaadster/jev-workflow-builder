@@ -15,10 +15,12 @@ import {
   Check,
   CircleDashed,
   FileOutput,
+  Globe,
   Loader2,
   MessageSquareText,
   Pencil,
   Plus,
+  Search,
   Sparkles,
   Trash2,
 } from "lucide-react";
@@ -43,6 +45,8 @@ import {
   IN_HANDLE,
   LLM_MODEL_GROUPS,
   LLM_MODELS,
+  MAX_FETCH_URLS,
+  WEB_SEARCH_RESULT_COUNTS,
   createOutputProperty,
   createQuestion,
   getActivation,
@@ -53,6 +57,7 @@ import {
   truncate,
   type ActivationMode,
   type Criterion,
+  type FetchNode,
   type HandleDef,
   type InputNode,
   type JevNode,
@@ -61,6 +66,7 @@ import {
   type OutputProperty,
   type QuestionDef,
   type QuestionType,
+  type WebSearchNode,
   type WorkflowNode,
   type WorkflowEdge,
 } from "./shared";
@@ -807,6 +813,160 @@ const LlmNodeView = memo(({ id, data, selected }: NodeProps<LlmNode>) => {
 });
 
 /* -------------------------------------------------------------------------- */
+/*                           Web search and fetch nodes                        */
+/* -------------------------------------------------------------------------- */
+
+function TinyFishSummary({
+  result,
+  template,
+  empty,
+}: {
+  result: NodeResultData | undefined;
+  template: string;
+  empty: string;
+}) {
+  return (
+    <div className="flex flex-col gap-1.5">
+      <p className="text-xs text-neutral-500">
+        <span className="font-medium text-neutral-700">TinyFish</span>
+        {result?.mock ? " · mock" : ""}
+      </p>
+      {result?.output !== undefined &&
+      result.status !== "skipped" &&
+      result.status !== "running" ? (
+        <p className="max-h-24 overflow-hidden whitespace-pre-wrap rounded bg-neutral-50 px-2 py-1 text-xs leading-relaxed text-neutral-700">
+          {truncate(result.output, 220)}
+        </p>
+      ) : (
+        <p className="text-xs leading-relaxed text-neutral-500">
+          {truncate(template || empty, 140)}
+        </p>
+      )}
+    </div>
+  );
+}
+
+const TEMPLATE_HINT = (
+  <>
+    Use <code>{"{{input}}"}</code> and <code>{"{{answers.<id>}}"}</code>.
+  </>
+);
+
+const WebSearchNodeView = memo(
+  ({ id, data, selected }: NodeProps<WebSearchNode>) => {
+    const { updateNodeData } = useReactFlow<WorkflowNode>();
+    const { results } = useRun();
+    const result = results.get(id);
+    const node: WebSearchNode = {
+      id,
+      type: "web-search",
+      position: { x: 0, y: 0 },
+      data,
+    };
+
+    return (
+      <NodeFrame
+        id={id}
+        node={node}
+        selected={selected}
+        icon={<Search className="size-3.5" />}
+        accent="#d97706"
+        result={result}
+        hasTarget
+        handles={getSourceHandles(node)}
+        summary={
+          <TinyFishSummary
+            result={result}
+            template={data.query}
+            empty="Empty query (node is skipped)."
+          />
+        }
+        editor={
+          <div className="flex flex-col gap-2">
+            <label className="flex flex-col gap-1">
+              <FieldLabel>Query</FieldLabel>
+              <TextArea
+                rows={2}
+                value={data.query}
+                placeholder="{{input}}"
+                onCommit={(query) => updateNodeData(id, { query })}
+              />
+            </label>
+            <label className="flex flex-col gap-1">
+              <FieldLabel>Results</FieldLabel>
+              <Select
+                value={data.maxResults}
+                onChange={(event) =>
+                  updateNodeData(id, {
+                    maxResults: Number(event.target.value),
+                  })
+                }
+              >
+                {WEB_SEARCH_RESULT_COUNTS.map((count) => (
+                  <option key={count} value={count}>
+                    {count}
+                  </option>
+                ))}
+              </Select>
+            </label>
+            <p className="text-[11px] leading-relaxed text-neutral-400">
+              {TEMPLATE_HINT} Outputs a numbered list of titles, URLs and
+              snippets — connect a Fetch node to read the pages.
+            </p>
+          </div>
+        }
+      />
+    );
+  }
+);
+
+const FetchNodeView = memo(({ id, data, selected }: NodeProps<FetchNode>) => {
+  const { updateNodeData } = useReactFlow<WorkflowNode>();
+  const { results } = useRun();
+  const result = results.get(id);
+  const node: FetchNode = { id, type: "fetch", position: { x: 0, y: 0 }, data };
+
+  return (
+    <NodeFrame
+      id={id}
+      node={node}
+      selected={selected}
+      icon={<Globe className="size-3.5" />}
+      accent="#0d9488"
+      result={result}
+      hasTarget
+      handles={getSourceHandles(node)}
+      summary={
+        <TinyFishSummary
+          result={result}
+          template={data.urls}
+          empty="No URLs (node is skipped)."
+        />
+      }
+      editor={
+        <div className="flex flex-col gap-2">
+          <label className="flex flex-col gap-1">
+            <FieldLabel>URLs</FieldLabel>
+            <TextArea
+              rows={3}
+              value={data.urls}
+              placeholder="{{input}}"
+              onCommit={(urls) => updateNodeData(id, { urls })}
+            />
+          </label>
+          <p className="text-[11px] leading-relaxed text-neutral-400">
+            {TEMPLATE_HINT} Fetches the first {MAX_FETCH_URLS} http(s) URLs
+            found in the text and outputs each page as markdown. Use{" "}
+            <code>{"{{urls.2}}"}</code> to fetch only the input&apos;s second
+            URL. Skipped when there are none.
+          </p>
+        </div>
+      }
+    />
+  );
+});
+
+/* -------------------------------------------------------------------------- */
 /*                                 Output node                                */
 /* -------------------------------------------------------------------------- */
 
@@ -1033,5 +1193,7 @@ export const nodeTypes: NodeTypes = {
   input: InputNodeView,
   jev: JevNodeView,
   llm: LlmNodeView,
+  "web-search": WebSearchNodeView,
+  fetch: FetchNodeView,
   output: OutputNodeView,
 };

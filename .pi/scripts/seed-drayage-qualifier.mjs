@@ -134,7 +134,7 @@ Port-oriented location: {{answers.port_oriented}} (probability {{answers.port_or
 Fleet size fit: {{answers.size_profile}} (probability {{answers.size_profile.probability}})
 Risk profile fit: {{answers.risk_profile}} (probability {{answers.risk_profile.probability}})
 
-Open with why it qualifies as a drayage target, name the single strongest piece of evidence, cite the port metro you matched, and suggest the opening angle. Plain text, under 90 words.`;
+Open with why it qualifies as a drayage target, name the single strongest piece of evidence, cite the port metro you matched, and suggest the opening angle. Plain text, one short paragraph a rep can read just before dialing.`;
 
 const ADJACENT_PROMPT = `Write a one-paragraph note for a carrier that is a real for-hire trucking operation near a port, but not clearly a container drayage operator.
 
@@ -146,7 +146,7 @@ Port-oriented location: {{answers.port_oriented}} (probability {{answers.port_or
 Fleet size fit: {{answers.size_profile}} (probability {{answers.size_profile.probability}})
 Risk profile fit: {{answers.risk_profile}} (probability {{answers.risk_profile.probability}})
 
-Say what it actually does, what would have to be true for it to become a drayage account, and the one question that would settle it. Plain text, under 90 words.`;
+Say what it actually does, what would have to be true for it to become a drayage account, and the one question that would settle it. Plain text, one short paragraph.`;
 
 const REVIEW_PROMPT = `Write a short triage note for a carrier that did not clear the drayage screen. A human decides whether it belongs in the list.
 
@@ -158,7 +158,7 @@ Port-oriented location: {{answers.port_oriented}} (probability {{answers.port_or
 Fleet size fit: {{answers.size_profile}} (probability {{answers.size_profile.probability}})
 Risk profile fit: {{answers.risk_profile}} (probability {{answers.risk_profile.probability}})
 
-State what the record actually is, which checks it failed, and the one question a human should answer. Be specific about the failure rather than restating the record. Plain text, under 80 words.`;
+State what the record actually is, which checks it failed, and the one question a human should answer. Be specific about the failure rather than restating the record. Plain text, a few sentences a reviewer can scan.`;
 
 const OUTPUT_PROPERTIES = [
   { id: "prop-qualified", name: "qualified" },

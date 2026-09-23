@@ -83,7 +83,7 @@ export function createDemoWorkflow(): {
       position: { x: COLUMN * 2, y: 0 },
       label: "Draft billing reply",
       system:
-        "You are a support agent for an online store. Reply in under 80 words, in plain text.",
+        "You are a support agent for an online store. Reply in plain text, short enough to read on a phone, and answer only what the ticket asks.",
       prompt:
         "Write a reply to this billing ticket. Confirm the duplicate charge will be refunded within 3-5 business days.\n\nTicket:\n{{input}}\n\nCustomer frustration level: {{answers.frustration}}",
     }),
@@ -92,7 +92,7 @@ export function createDemoWorkflow(): {
       position: { x: COLUMN * 2, y: ROW },
       label: "Draft technical reply",
       system:
-        "You are a technical support engineer. Reply in under 80 words, in plain text.",
+        "You are a technical support engineer. Reply in plain text, short enough to read on a phone, and answer only what the ticket asks.",
       prompt:
         "Write a reply to this technical ticket. Ask for the one piece of information you need most to debug it.\n\nTicket:\n{{input}}",
     }),

@@ -23,6 +23,7 @@ export type JevResult = {
   answers: Record<string, Answer>;
   model: string;
   mock: boolean;
+  usage?: { inputTokens?: number; outputTokens?: number };
 };
 
 let client: TypeSafeClient | null = null;
@@ -155,7 +156,15 @@ export async function askJev(
     }
   }
 
-  return { answers, model: response.model, mock: false };
+  return {
+    answers,
+    model: response.model,
+    mock: false,
+    usage: {
+      inputTokens: response.usage.input_tokens,
+      outputTokens: response.usage.output_tokens,
+    },
+  };
 }
 
 /* -------------------------------------------------------------------------- */

@@ -159,6 +159,31 @@ export type LlmNodeData = {
  * properties, according to the connected target handle.
  * To merge several drafts into one string, run them through an LLM node first.
  */
+/**
+ * TinyFish web search. `query` is a template; results become a numbered text
+ * list (title, URL, snippet) so a downstream fetch node can pick up the URLs.
+ */
+export type WebSearchNodeData = {
+  label: string;
+  query: string;
+  maxResults: number;
+  activation?: ActivationMode;
+};
+
+/**
+ * TinyFish fetch. `urls` is a template; every http(s) URL found in the
+ * rendered text is fetched (up to `MAX_FETCH_URLS`) and returned as markdown.
+ */
+export type FetchNodeData = {
+  label: string;
+  urls: string;
+  activation?: ActivationMode;
+};
+
+export const WEB_SEARCH_RESULT_COUNTS = [3, 5, 10] as const;
+export const DEFAULT_WEB_SEARCH_RESULTS = 5;
+export const MAX_FETCH_URLS = 3;
+
 export type OutputNodeData = {
   label: string;
   activation?: ActivationMode;
@@ -205,8 +230,16 @@ export function getActivation(data: {
 export type InputNode = Node<InputNodeData, "input">;
 export type JevNode = Node<JevNodeData, "jev">;
 export type LlmNode = Node<LlmNodeData, "llm">;
+export type WebSearchNode = Node<WebSearchNodeData, "web-search">;
+export type FetchNode = Node<FetchNodeData, "fetch">;
 export type OutputNode = Node<OutputNodeData, "output">;
-export type WorkflowNode = InputNode | JevNode | LlmNode | OutputNode;
+export type WorkflowNode =
+  | InputNode
+  | JevNode
+  | LlmNode
+  | WebSearchNode
+  | FetchNode
+  | OutputNode;
 export type WorkflowNodeType = WorkflowNode["type"];
 
 export type WorkflowEdgeData = Record<string, never>;
@@ -269,6 +302,8 @@ export function getSourceHandles(node: WorkflowNode): HandleDef[] {
   switch (node.type) {
     case "input":
     case "llm":
+    case "web-search":
+    case "fetch":
       return [{ id: OUT_HANDLE, label: "output", title: "Output text" }];
     case "jev":
       return [
@@ -409,6 +444,68 @@ export function createLlmNode(args: {
       activation: args.activation ?? "any",
     },
   };
+}
+
+export function createWebSearchNode(args: {
+  id?: string;
+  position: Point;
+  label?: string;
+  query?: string;
+  maxResults?: number;
+  activation?: ActivationMode;
+  selected?: boolean;
+}): WebSearchNode {
+  return {
+    id: args.id ?? `web-search-${nanoid(8)}`,
+    type: "web-search",
+    position: args.position,
+    selected: args.selected,
+    data: {
+      label: args.label ?? "Web search",
+      query: args.query ?? "{{input}}",
+      maxResults: args.maxResults ?? DEFAULT_WEB_SEARCH_RESULTS,
+      activation: args.activation ?? "any",
+    },
+  };
+}
+
+export function createFetchNode(args: {
+  id?: string;
+  position: Point;
+  label?: string;
+  urls?: string;
+  activation?: ActivationMode;
+  selected?: boolean;
+}): FetchNode {
+  return {
+    id: args.id ?? `fetch-${nanoid(8)}`,
+    type: "fetch",
+    position: args.position,
+    selected: args.selected,
+    data: {
+      label: args.label ?? "Fetch",
+      urls: args.urls ?? "{{input}}",
+      activation: args.activation ?? "any",
+    },
+  };
+}
+
+/**
+ * Unique http(s) URLs in `text`, in order of appearance. Trailing punctuation
+ * and markdown link syntax are stripped.
+ */
+export function extractUrls(text: string, max: number): string[] {
+  const urls = new Set<string>();
+
+  for (const match of text.matchAll(/https?:\/\/[^\s<>"'`)\]]+/g)) {
+    urls.add(match[0].replace(/[.,;:!?]+$/, ""));
+
+    if (urls.size >= max) {
+      break;
+    }
+  }
+
+  return [...urls];
 }
 
 export function createWorkflowEdge(args: {
@@ -574,7 +671,8 @@ export type AnswerValue = {
 };
 
 /**
- * Resolves `{{input}}`, `{{answers.<id>}}`, `{{answers.<id>.probability}}` and
+ * Resolves `{{input}}`, `{{urls.<n>}}` (the nth http(s) URL in the input,
+ * from 1), `{{answers.<id>}}`, `{{answers.<id>.probability}}` and
  * `{{answers.<id>.confidence}}`. Unknown placeholders resolve to "".
  */
 export function renderTemplate(
@@ -587,6 +685,13 @@ export function renderTemplate(
     }
 
     const [root, id, field] = path.split(".");
+
+    // Lets parallel branches each pick one web search result, e.g. a Jev node
+    // judging result 3 followed by a fetch of `{{urls.3}}`.
+    if (root === "urls" && /^[1-9]\d*$/.test(id ?? "")) {
+      const index = Number(id);
+      return extractUrls(context.input, index)[index - 1] ?? "";
+    }
 
     if (root !== "answers" || !id) {
       return "";

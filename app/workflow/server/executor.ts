@@ -16,7 +16,9 @@ import {
 import {
   ANY_HANDLE,
   INPUT_NODE_ID,
+  MAX_FETCH_URLS,
   OUT_HANDLE,
+  extractUrls,
   getActivation,
   getOutputProperties,
   getOutputPropertyId,
@@ -26,13 +28,16 @@ import {
   topologicalOrder,
   truncate,
   type AnswerValue,
+  type FetchNode,
   type JevNode,
   type LlmNode,
   type QuestionDef,
+  type WebSearchNode,
   type WorkflowNode,
 } from "../shared";
 import { liveblocks, readWorkflowGraph } from "./liveblocks";
 import { runLlm } from "./llm";
+import { fetchPages, webSearch, type TinyFishResult } from "./tinyfish";
 import { askJev, type JevState } from "./typesafe";
 
 const STREAM_THROTTLE_MS = 100;
@@ -311,6 +316,22 @@ async function runWorkflow(
         });
       }
 
+      if (node.type === "web-search") {
+        return await executeWebSearch(node, base, messageId, {
+          input: nodeInput,
+          answers,
+          rawAnswers,
+        });
+      }
+
+      if (node.type === "fetch") {
+        return await executeFetch(node, base, messageId, {
+          input: nodeInput,
+          answers,
+          rawAnswers,
+        });
+      }
+
       const properties = getOutputProperties(node.data);
       const outputs = createEmptyOutput(properties);
       const seen = new Map<string, Set<string>>();
@@ -387,6 +408,7 @@ async function runWorkflow(
         firedHandles: [...firedHandles],
         mock: result.mock,
         model: result.model,
+        usage: result.usage,
         durationMs: Date.now() - base.startedAt,
       },
       messageId
@@ -467,6 +489,7 @@ async function runWorkflow(
         firedHandles: [OUT_HANDLE],
         mock: result.mock,
         model: result.model,
+        usage: result.usage,
         durationMs: Date.now() - base.startedAt,
       },
       messageId
@@ -474,6 +497,73 @@ async function runWorkflow(
 
     return {
       output: result.text,
+      answers: context.answers,
+      rawAnswers: context.rawAnswers,
+      firedHandles: new Set([OUT_HANDLE]),
+    };
+  }
+
+  async function executeWebSearch(
+    node: WebSearchNode,
+    base: NodeResultData,
+    messageId: string | undefined,
+    context: Pick<NodeState, "answers" | "rawAnswers"> & { input: string }
+  ): Promise<NodeState> {
+    const query = renderTemplate(node.data.query, context).trim();
+
+    return executeTinyFish(base, messageId, context, query === "", () =>
+      webSearch({
+        query,
+        maxResults: node.data.maxResults,
+        signal: abort.signal,
+      })
+    );
+  }
+
+  async function executeFetch(
+    node: FetchNode,
+    base: NodeResultData,
+    messageId: string | undefined,
+    context: Pick<NodeState, "answers" | "rawAnswers"> & { input: string }
+  ): Promise<NodeState> {
+    const urls = extractUrls(
+      renderTemplate(node.data.urls, context),
+      MAX_FETCH_URLS
+    );
+
+    return executeTinyFish(base, messageId, context, urls.length === 0, () =>
+      fetchPages({ urls, signal: abort.signal })
+    );
+  }
+
+  /**
+   * Shared by the web search and fetch nodes: an empty query or no URLs skips
+   * the node and passes the input through, like an LLM node with no prompt.
+   */
+  async function executeTinyFish(
+    base: NodeResultData,
+    messageId: string | undefined,
+    context: Pick<NodeState, "answers" | "rawAnswers"> & { input: string },
+    skip: boolean,
+    run: () => Promise<TinyFishResult>
+  ): Promise<NodeState> {
+    const result = skip ? null : await run();
+    const output = result ? result.text : context.input;
+
+    await writeMessage(
+      {
+        ...base,
+        status: result ? "complete" : "skipped",
+        output,
+        firedHandles: [OUT_HANDLE],
+        mock: result?.mock,
+        durationMs: Date.now() - base.startedAt,
+      },
+      messageId
+    );
+
+    return {
+      output,
       answers: context.answers,
       rawAnswers: context.rawAnswers,
       firedHandles: new Set([OUT_HANDLE]),

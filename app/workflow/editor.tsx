@@ -33,9 +33,11 @@ import {
   Bot,
   Eye,
   FileOutput,
+  Globe,
   MessageSquareText,
   Plus,
   Redo2,
+  Search,
   Sparkles,
   Undo2,
   X,
@@ -55,15 +57,19 @@ import {
   IN_HANDLE,
   WORKFLOW_EDGE_TYPE,
   createInputNode,
+  createFetchNode,
   createJevNode,
   createLlmNode,
   createOutputNode,
+  createWebSearchNode,
   createWorkflowEdge,
   getReachableNodeIds,
   getOutputPropertyId,
   wouldCreateCycle,
+  type Point,
   type WorkflowEdge,
   type WorkflowNode,
+  type WorkflowNodeType,
 } from "./shared";
 
 function FlowCursor({ userId }: CursorsCursorProps) {
@@ -293,7 +299,7 @@ export function WorkflowEditor({ className, ...props }: ComponentProps<"div">) {
   );
 
   const addNode = useCallback(
-    (kind: "input" | "jev" | "llm" | "output") => {
+    (kind: WorkflowNodeType) => {
       // Place new nodes near the center of the current viewport, offset so
       // repeated clicks don't stack exactly.
       const container = document.querySelector(".react-flow");
@@ -313,14 +319,18 @@ export function WorkflowEditor({ className, ...props }: ComponentProps<"div">) {
         .filter((node) => node.selected)
         .map((node) => ({ type: "select", id: node.id, selected: false }));
 
-      const item =
-        kind === "input"
-          ? createInputNode({ position, selected: true })
-          : kind === "jev"
-            ? createJevNode({ position, selected: true })
-            : kind === "llm"
-              ? createLlmNode({ position, selected: true })
-              : createOutputNode({ position, selected: true });
+      const factories: Record<
+        WorkflowNodeType,
+        (args: { position: Point; selected: boolean }) => WorkflowNode
+      > = {
+        input: createInputNode,
+        jev: createJevNode,
+        llm: createLlmNode,
+        "web-search": createWebSearchNode,
+        fetch: createFetchNode,
+        output: createOutputNode,
+      };
+      const item = factories[kind]({ position, selected: true });
 
       onNodesChange([...deselect, { type: "add", item }]);
     },
@@ -422,6 +432,26 @@ export function WorkflowEditor({ className, ...props }: ComponentProps<"div">) {
                 <Bot className="size-4" />
               </span>{" "}
               LLM
+            </button>
+            <button
+              type="button"
+              onClick={() => addNode("web-search")}
+              className="toolbar-button hover:bg-amber-50 hover:text-amber-700"
+            >
+              <span className="toolbar-icon bg-amber-50 text-amber-600">
+                <Search className="size-4" />
+              </span>{" "}
+              Web search
+            </button>
+            <button
+              type="button"
+              onClick={() => addNode("fetch")}
+              className="toolbar-button hover:bg-teal-50 hover:text-teal-700"
+            >
+              <span className="toolbar-icon bg-teal-50 text-teal-600">
+                <Globe className="size-4" />
+              </span>{" "}
+              Fetch
             </button>
             {nodes.some((node) => node.type === "output") ? null : (
               <button

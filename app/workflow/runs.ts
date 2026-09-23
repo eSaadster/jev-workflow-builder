@@ -75,6 +75,8 @@ export type NodeResultData = {
   // Set when the node ran against a mock instead of a real provider.
   mock?: boolean;
   model?: string;
+  // Tokens reported by the provider, when it reports them.
+  usage?: { inputTokens?: number; outputTokens?: number };
   durationMs?: number;
   error?: string;
   startedAt: number;

@@ -13,6 +13,8 @@ import {
   Sparkles,
   MessageSquareText,
   FileOutput,
+  Globe,
+  Search,
   CircleDashed,
   ChevronLeft,
   ChevronRight,
@@ -79,6 +81,10 @@ function NodeTypeIcon({ type }: { type: WorkflowNodeType }) {
       return <Sparkles className="size-3.5 text-violet-600" />;
     case "llm":
       return <Bot className="size-3.5 text-sky-600" />;
+    case "web-search":
+      return <Search className="size-3.5 text-amber-600" />;
+    case "fetch":
+      return <Globe className="size-3.5 text-teal-600" />;
     case "output":
       return <FileOutput className="size-3.5 text-emerald-600" />;
   }
@@ -267,7 +273,9 @@ function TraceNode({
           </div>
         ) : null}
 
-        {message.nodeType === "llm" &&
+        {(message.nodeType === "llm" ||
+          message.nodeType === "web-search" ||
+          message.nodeType === "fetch") &&
         message.output !== undefined &&
         message.status !== "skipped" ? (
           <p className="whitespace-pre-wrap border-t border-neutral-100 px-2.5 py-1.5 text-xs leading-relaxed text-neutral-700">

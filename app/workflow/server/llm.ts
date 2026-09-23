@@ -49,7 +49,12 @@ export type LlmRunOptions = {
   signal?: AbortSignal;
 };
 
-export type LlmResult = { text: string; mock: boolean; model: string };
+export type LlmResult = {
+  text: string;
+  mock: boolean;
+  model: string;
+  usage?: { inputTokens?: number; outputTokens?: number };
+};
 
 export async function runLlm(options: LlmRunOptions): Promise<LlmResult> {
   const provider = createProvider(options.sessionId ?? crypto.randomUUID());
@@ -75,7 +80,13 @@ export async function runLlm(options: LlmRunOptions): Promise<LlmResult> {
     await options.onChunk(text);
   }
 
-  return { text, mock: false, model: options.model };
+  const usage = await result.usage;
+  return {
+    text,
+    mock: false,
+    model: options.model,
+    usage: { inputTokens: usage.inputTokens, outputTokens: usage.outputTokens },
+  };
 }
 
 function sleep(ms: number) {

@@ -8,3 +8,17 @@ node_modules
 .next
 out
 next-env.d.ts
+
+# Local workflow scripts, saved runs, and reports
+.pi/prm/
+.pi/tasks/
+.pi/x-posts/
+.pi/scripts/export-prm-runs.mjs
+.pi/scripts/lib/x-algorithm.mjs
+.pi/scripts/score-prm-vendors.mjs
+.pi/scripts/score-x-schedule.mjs
+.pi/scripts/seed-prm-evaluator.mjs
+.pi/scripts/seed-summit-strict.mjs
+.pi/scripts/seed-x-post-scorer.mjs
+app/workflow/summit-scoring.workflow.ts
+prm-evaluation-report.html

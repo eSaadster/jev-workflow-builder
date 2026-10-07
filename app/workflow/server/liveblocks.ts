@@ -4,6 +4,7 @@ import { Liveblocks } from "@liveblocks/node";
 import { mutateFlow } from "@liveblocks/react-flow/node";
 import { nanoid } from "nanoid";
 import { createDemoWorkflow, DEMO_WORKFLOW_NAME } from "../demo";
+import { summitScoringWorkflow } from "../summit-scoring.workflow";
 import {
   EXAMPLE_ID,
   FLOW_STORAGE_KEY,
@@ -96,13 +97,19 @@ export async function getWorkflow(
 
 export async function createWorkflow(
   exampleId: string | null | undefined,
-  options: { name?: string; seedDemo?: boolean } = {}
+  options: { name?: string; seedDemo?: boolean; seed?: "demo" | "summit" } = {}
 ): Promise<WorkflowSummary> {
   const workflowId = nanoid(10);
   const roomId = getRoomId(workflowId, exampleId);
+  const seed =
+    options.seed ?? (options.seedDemo === true ? "demo" : undefined);
   const name =
     options.name ??
-    (options.seedDemo ? DEMO_WORKFLOW_NAME : "Untitled workflow");
+    (seed === "summit"
+      ? summitScoringWorkflow.name
+      : seed === "demo"
+        ? DEMO_WORKFLOW_NAME
+        : "Untitled workflow");
 
   const room = await liveblocks.createRoom(roomId, {
     defaultAccesses: ["room:write"],
@@ -110,7 +117,14 @@ export async function createWorkflow(
   });
 
   const { nodes, edges } =
-    options.seedDemo === true ? createDemoWorkflow() : { nodes: [], edges: [] };
+    seed === "summit"
+      ? {
+          nodes: summitScoringWorkflow.nodes as WorkflowNode[],
+          edges: summitScoringWorkflow.edges as WorkflowEdge[],
+        }
+      : seed === "demo"
+        ? createDemoWorkflow()
+        : { nodes: [], edges: [] };
 
   await mutateFlow<WorkflowNode, WorkflowEdge>(
     { client: liveblocks, roomId, storageKey: FLOW_STORAGE_KEY },
@@ -126,6 +140,22 @@ export async function createWorkflow(
     createdAt: new Date(room.createdAt).getTime(),
     lastConnectionAt: null,
   };
+}
+
+/**
+ * Creates the Future Action Summit scoring workflow once per app key.
+ * Later loads leave the existing room alone.
+ */
+export async function ensureSummitWorkflow(
+  exampleId: string | null | undefined
+): Promise<void> {
+  const workflows = await listWorkflows(exampleId);
+
+  if (workflows.some((workflow) => workflow.name === summitScoringWorkflow.name)) {
+    return;
+  }
+
+  await createWorkflow(exampleId, { seed: "summit" });
 }
 
 export async function renameWorkflow(

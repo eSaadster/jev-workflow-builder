@@ -3,8 +3,9 @@ import type { RunTrigger } from "../../../../workflow/runs";
 import { startWorkflowRun } from "../../../../workflow/server/executor";
 import { getRoomId, getWorkflow } from "../../../../workflow/server/liveblocks";
 
-// Runs can take a while when several LLM nodes chain.
-export const maxDuration = 120;
+// A scoring run is two Jev calls plus one LLM call. Keep the platform
+// limit above RUN_TIMEOUT_MS (180s).
+export const maxDuration = 300;
 
 /**
  * Triggers a workflow run.

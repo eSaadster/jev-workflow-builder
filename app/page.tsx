@@ -1,5 +1,8 @@
 import { WorkflowList } from "./workflow/workflow-list";
-import { listWorkflows } from "./workflow/server/liveblocks";
+import {
+  ensureSummitWorkflow,
+  listWorkflows,
+} from "./workflow/server/liveblocks";
 
 export const dynamic = "force-dynamic";
 
@@ -36,6 +39,7 @@ export default async function Page({
     );
   }
 
+  await ensureSummitWorkflow(exampleId);
   const workflows = await listWorkflows(exampleId);
 
   return <WorkflowList workflows={workflows} exampleId={exampleId} />;

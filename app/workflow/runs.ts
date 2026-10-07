@@ -100,4 +100,4 @@ export type RunTrace = RunSummary & {
 
 export const MAX_INPUT_PREVIEW = 200;
 export const MAX_NODE_EXECUTIONS = 25;
-export const RUN_TIMEOUT_MS = 60_000;
+export const RUN_TIMEOUT_MS = 180_000;

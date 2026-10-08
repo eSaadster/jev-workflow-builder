@@ -1,5 +1,6 @@
 import "server-only";
 import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
+import type { ToolSet } from "ai";
 
 // OpenCode Zen's OpenAI-compatible API. The base URL is the prefix only: the
 // provider appends `/chat/completions` itself.
@@ -56,6 +57,134 @@ export type LlmResult = {
   usage?: { inputTokens?: number; outputTokens?: number };
 };
 
+/* -------------------------------------------------------------------------- */
+/*                         Conversation turns with tools                      */
+/* -------------------------------------------------------------------------- */
+
+export type ConversationLlmMessage = {
+  role: "user" | "assistant";
+  content: string;
+};
+
+export type AgentToolSpec = {
+  name: string;
+  description: string;
+  // Raw JSON Schema for the tool arguments.
+  inputSchema: {
+    type: "object";
+    properties: Record<string, unknown>;
+    required?: string[];
+  };
+  execute: (args: Record<string, unknown>) => Promise<unknown>;
+};
+
+export type ConversationTurnResult = {
+  text: string;
+  mock: boolean;
+  model: string;
+  usage?: { inputTokens?: number; outputTokens?: number };
+};
+
+/**
+ * One conversation turn: message history plus optional function-calling tools
+ * (executed inline, with the model continuing over their results). Used by the
+ * call-agent turn engine.
+ */
+export async function runConversationTurn(options: {
+  system: string;
+  messages: ConversationLlmMessage[];
+  model: string;
+  sessionId?: string;
+  tools?: AgentToolSpec[];
+  maxSteps?: number;
+  signal?: AbortSignal;
+  onChunk?: (text: string) => void | Promise<void>;
+}): Promise<ConversationTurnResult> {
+  const provider = createProvider(options.sessionId ?? crypto.randomUUID());
+
+  if (!provider) {
+    return mockConversationTurn(options);
+  }
+
+  const { streamText, jsonSchema, stepCountIs } = await import("ai");
+  const tools: ToolSet = {};
+
+  for (const spec of options.tools ?? []) {
+    tools[spec.name] = {
+      description: spec.description || undefined,
+      inputSchema: jsonSchema(
+        spec.inputSchema as Parameters<typeof jsonSchema>[0]
+      ),
+      execute: async (args: Record<string, unknown>) => spec.execute(args),
+    };
+  }
+
+  const result = streamText({
+    model: provider.chatModel(resolveModelId(options.model)),
+    system: options.system || undefined,
+    messages: options.messages,
+    tools: Object.keys(tools).length > 0 ? tools : undefined,
+    stopWhen: stepCountIs(options.maxSteps ?? 4),
+    abortSignal: options.signal,
+  });
+
+  let text = "";
+
+  for await (const delta of result.textStream) {
+    text += delta;
+    await options.onChunk?.(text);
+  }
+
+  const usage = await result.usage;
+
+  return {
+    text,
+    mock: false,
+    model: options.model,
+    usage: { inputTokens: usage.inputTokens, outputTokens: usage.outputTokens },
+  };
+}
+
+function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+/**
+ * Keyless fallback for conversation turns: a short canned reply in the
+ * persona's voice. Tools are not simulated here — use the tool test runner
+ * to exercise HTTP tools without keys.
+ */
+async function mockConversationTurn(options: {
+  messages: ConversationLlmMessage[];
+  signal?: AbortSignal;
+  onChunk?: (text: string) => void | Promise<void>;
+}): Promise<ConversationTurnResult> {
+  const lastUser = [...options.messages]
+    .reverse()
+    .find((message) => message.role === "user");
+  const opening = options.messages.length === 0;
+  const reply = opening
+    ? "Hi! This is your agent speaking — I'm running in mock mode without an API key, but the conversation flow, routing and variables all work. Set OPENCODE_ZEN_API_KEY for real replies."
+    : lastUser
+      ? `Got it — "${lastUser.content.slice(0, 80)}". Mock mode on: I heard you, and the scenarios, tools and variables around this turn are all live. Add OPENCODE_ZEN_API_KEY for real replies.`
+      : "Mock mode on.";
+
+  const words = reply.split(" ");
+  let text = "";
+
+  for (const word of words) {
+    if (options.signal?.aborted) {
+      break;
+    }
+
+    text += (text ? " " : "") + word;
+    await options.onChunk?.(text);
+    await sleep(30);
+  }
+
+  return { text, mock: true, model: "mock" };
+}
+
 export async function runLlm(options: LlmRunOptions): Promise<LlmResult> {
   const provider = createProvider(options.sessionId ?? crypto.randomUUID());
 
@@ -87,10 +216,6 @@ export async function runLlm(options: LlmRunOptions): Promise<LlmResult> {
     model: options.model,
     usage: { inputTokens: usage.inputTokens, outputTokens: usage.outputTokens },
   };
-}
-
-function sleep(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 /**

@@ -1,10 +1,12 @@
 "use client";
 
-import { ChevronRight, Plus, Workflow as WorkflowIcon } from "lucide-react";
+import { Bot, ChevronRight, Plus, Workflow as WorkflowIcon } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useTransition } from "react";
 import { HelpButton } from "../../components/help-button";
+import { createAgentAction } from "../agent/agent-actions";
+import type { AgentSummary } from "../agent/server/storage";
 import { createWorkflowAction } from "./actions";
 import type { WorkflowSummary } from "./server/liveblocks";
 
@@ -24,13 +26,16 @@ function formatRelative(timestamp: number): string {
 
 export function WorkflowList({
   workflows,
+  agents,
   exampleId,
 }: {
   workflows: WorkflowSummary[];
+  agents: AgentSummary[];
   exampleId: string | null;
 }) {
   const searchParams = useSearchParams();
   const [isCreating, startCreating] = useTransition();
+  const [isCreatingAgent, startCreatingAgent] = useTransition();
   const search = searchParams.toString();
   const suffix = search ? `?${search}` : "";
 
@@ -99,6 +104,64 @@ export function WorkflowList({
                 </span>
                 <ChevronRight
                   className="size-3 shrink-0 text-neutral-300 transition-colors group-hover:text-violet-600"
+                  aria-hidden
+                />
+              </Link>
+            </li>
+          ))}
+        </ul>
+
+        <header className="mb-4 mt-10 flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <h2 className="text-lg font-semibold tracking-tight text-neutral-900">
+              Call agents
+            </h2>
+            <span className="rounded bg-neutral-200/60 px-1.5 py-0.5 text-[10px] font-medium tabular-nums text-neutral-500">
+              {agents.length}
+            </span>
+          </div>
+          <button
+            type="button"
+            disabled={isCreatingAgent}
+            onClick={() =>
+              startCreatingAgent(() => createAgentAction(exampleId))
+            }
+            className="primary-button shrink-0"
+          >
+            <Plus className="size-3.5" />
+            {isCreatingAgent ? "Creating…" : "New agent"}
+          </button>
+        </header>
+
+        <ul className="workflow-list">
+          {agents.length === 0 ? (
+            <li className="px-3 py-4 text-xs text-neutral-400">
+              No call agents yet.
+            </li>
+          ) : null}
+          {agents.map((agent) => (
+            <li
+              key={agent.agentId}
+              className="min-w-0 border-b border-neutral-100 last:border-b-0"
+            >
+              <Link
+                href={`/a/${agent.agentId}${suffix}`}
+                className="workflow-list-row group flex items-center gap-2.5 px-3 py-2"
+              >
+                <span className="flex size-6 shrink-0 items-center justify-center rounded-md bg-amber-50 text-amber-600">
+                  <Bot className="size-3.5" aria-hidden />
+                </span>
+                <span className="min-w-0 flex-1 truncate text-xs font-medium text-neutral-900">
+                  {agent.name}
+                </span>
+                <span className="shrink-0 whitespace-nowrap text-[10px] text-neutral-500">
+                  <span className="hidden sm:inline">
+                    {agent.lastConnectionAt ? "Opened " : "Created "}
+                  </span>
+                  {formatRelative(agent.lastConnectionAt ?? agent.createdAt)}
+                </span>
+                <ChevronRight
+                  className="size-3 shrink-0 text-neutral-300 transition-colors group-hover:text-amber-600"
                   aria-hidden
                 />
               </Link>

@@ -321,6 +321,14 @@ select:disabled {
   border-color: #e9a0a0;
 }
 
+/* Scenario node currently active in the selected conversation. */
+.workflow-node[data-active] {
+  border-color: #f0b976;
+  box-shadow:
+    0 0 0 3px rgb(217 119 6 / 0.12),
+    0 8px 24px -8px rgb(30 23 45 / 0.15);
+}
+
 .workflow-node-unreachable .workflow-node {
   opacity: 0.55;
 }

@@ -3,6 +3,7 @@ import {
   ensureSummitWorkflow,
   listWorkflows,
 } from "./workflow/server/liveblocks";
+import { ensureDemoAgent, listAgents } from "./agent/server/storage";
 
 export const dynamic = "force-dynamic";
 
@@ -14,7 +15,8 @@ function getParam(params: SearchParams, key: string): string | null {
 }
 
 /**
- * Lists workflows (one Liveblocks room each). Workflows are created explicitly.
+ * Lists workflows and call agents (one Liveblocks room each). Both are
+ * created explicitly; a demo of each is seeded on first load.
  */
 export default async function Page({
   searchParams,
@@ -41,6 +43,10 @@ export default async function Page({
 
   await ensureSummitWorkflow(exampleId);
   const workflows = await listWorkflows(exampleId);
+  await ensureDemoAgent(exampleId);
+  const agents = await listAgents(exampleId);
 
-  return <WorkflowList workflows={workflows} exampleId={exampleId} />;
+  return (
+    <WorkflowList workflows={workflows} agents={agents} exampleId={exampleId} />
+  );
 }

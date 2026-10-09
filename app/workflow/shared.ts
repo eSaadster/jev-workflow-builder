@@ -18,8 +18,28 @@ export const ANY_HANDLE = "any";
 // Models served over Zen's `/zen/go/v1/chat/completions` endpoint, verified with
 // a live request each. Zen also offers grok-4.6, grok-4.7, gpt-5.6-luna and the
 // muse-spark-* models, but those only answer on `/zen/go/v1/responses` and need
-// `@ai-sdk/openai` instead of the provider used here.
-export const LLM_MODEL_GROUPS = [
+// `@ai-sdk/openai` instead of the provider used here. Anthropic models are the
+// other exception: they only answer on Zen's Anthropic-native
+// `/zen/go/v1/messages` endpoint (`protocol: "anthropic"` routes them there).
+export type ZenModel = {
+  id: string;
+  label: string;
+  // "anthropic" models are served over the Anthropic Messages protocol
+  // instead of OpenAI-compatible chat/completions.
+  protocol?: "anthropic";
+};
+
+export const LLM_MODEL_GROUPS: { label: string; models: ZenModel[] }[] = [
+  {
+    label: "Anthropic",
+    models: [
+      {
+        id: "claude-haiku-5-5",
+        label: "Claude Haiku 5.5",
+        protocol: "anthropic",
+      },
+    ],
+  },
   {
     label: "DeepSeek",
     models: [
@@ -85,6 +105,14 @@ export const LLM_MODEL_GROUPS = [
   },
 ];
 export const LLM_MODELS = LLM_MODEL_GROUPS.flatMap((group) => group.models);
+
+/** True when the model id is served over Zen's Anthropic Messages endpoint. */
+export function isAnthropicModel(modelId: string): boolean {
+  return LLM_MODELS.some(
+    (model) => model.id === modelId && model.protocol === "anthropic"
+  );
+}
+
 export const DEFAULT_LLM_MODEL = "deepseek-v4.1-flash";
 export const DEFAULT_NOUL_THRESHOLD = 0.7;
 

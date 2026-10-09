@@ -1,6 +1,8 @@
 import "server-only";
 import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
-import type { ToolSet } from "ai";
+import { createAnthropic } from "@ai-sdk/anthropic";
+import type { LanguageModel, ToolSet } from "ai";
+import { isAnthropicModel } from "../shared";
 
 // OpenCode Zen's OpenAI-compatible API. The base URL is the prefix only: the
 // provider appends `/chat/completions` itself.
@@ -18,25 +20,48 @@ function resolveModelId(model: string): string {
   return model.replace(/^[^/]+\//, "");
 }
 
-function createProvider(sessionId: string) {
+function getBaseUrl(): string {
+  return (process.env.OPENCODE_ZEN_BASE_URL || DEFAULT_LLM_BASE_URL).replace(
+    /\/+$/,
+    ""
+  );
+}
+
+/**
+ * Picks the provider per model: Zen serves most models over OpenAI-compatible
+ * chat/completions, but Anthropic models only answer on the Anthropic-native
+ * `<base>/messages` endpoint (the provider appends it to baseURL).
+ */
+function resolveModel(sessionId: string, model: string): LanguageModel | null {
   const apiKey = process.env.OPENCODE_ZEN_API_KEY;
 
   if (!apiKey) {
     return null;
   }
 
-  return createOpenAICompatible({
+  if (isAnthropicModel(model)) {
+    const anthropic = createAnthropic({
+      apiKey,
+      baseURL: getBaseUrl(),
+      headers: {
+        [SESSION_HEADER]: sessionId,
+        "user-agent": USER_AGENT,
+      },
+    });
+    return anthropic(model);
+  }
+
+  const provider = createOpenAICompatible({
     name: "opencode-zen",
-    baseURL: (process.env.OPENCODE_ZEN_BASE_URL || DEFAULT_LLM_BASE_URL).replace(
-      /\/+$/,
-      ""
-    ),
+    baseURL: getBaseUrl(),
     apiKey,
     headers: {
       [SESSION_HEADER]: sessionId,
       "user-agent": USER_AGENT,
     },
   });
+
+  return provider.chatModel(resolveModelId(model));
 }
 
 export type LlmRunOptions = {
@@ -100,9 +125,12 @@ export async function runConversationTurn(options: {
   signal?: AbortSignal;
   onChunk?: (text: string) => void | Promise<void>;
 }): Promise<ConversationTurnResult> {
-  const provider = createProvider(options.sessionId ?? crypto.randomUUID());
+  const model = resolveModel(
+    options.sessionId ?? crypto.randomUUID(),
+    options.model
+  );
 
-  if (!provider) {
+  if (!model) {
     return mockConversationTurn(options);
   }
 
@@ -120,7 +148,7 @@ export async function runConversationTurn(options: {
   }
 
   const result = streamText({
-    model: provider.chatModel(resolveModelId(options.model)),
+    model,
     system: options.system || undefined,
     messages: options.messages,
     tools: Object.keys(tools).length > 0 ? tools : undefined,
@@ -186,9 +214,12 @@ async function mockConversationTurn(options: {
 }
 
 export async function runLlm(options: LlmRunOptions): Promise<LlmResult> {
-  const provider = createProvider(options.sessionId ?? crypto.randomUUID());
+  const model = resolveModel(
+    options.sessionId ?? crypto.randomUUID(),
+    options.model
+  );
 
-  if (!provider) {
+  if (!model) {
     return streamMockReply(options);
   }
 
@@ -196,7 +227,7 @@ export async function runLlm(options: LlmRunOptions): Promise<LlmResult> {
   // the call away from the AI SDK's default gateway provider.
   const { streamText } = await import("ai");
   const result = streamText({
-    model: provider.chatModel(resolveModelId(options.model)),
+    model,
     system: options.system || undefined,
     prompt: options.prompt,
     abortSignal: options.signal,

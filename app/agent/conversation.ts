@@ -1,4 +1,4 @@
-import type { Answer } from "../workflow/runs";
+import type { Answer, RunTrigger } from "../workflow/runs";
 
 /**
  * One agent conversation = one Liveblocks feed (like workflow runs). Every
@@ -109,12 +109,33 @@ export type StepEvent = ConversationEventBase & {
   mock?: boolean;
 };
 
+export type CallDirection = "inbound" | "outbound" | "web";
+
+/**
+ * Phone-provider bookkeeping (AgentPhone): written when a call conversation
+ * opens and again when the provider reports the call ended, so the feed
+ * records direction, duration and disconnect reason alongside the transcript.
+ */
+export type CallEvent = ConversationEventBase & {
+  kind: "call";
+  callId: string;
+  direction: CallDirection;
+  status: "in-progress" | "completed" | "failed";
+  from: string;
+  to: string;
+  durationSeconds?: number;
+  disconnectionReason?: string;
+  summary?: string;
+};
+
 export type ConversationStateEvent = ConversationEventBase & {
   kind: "state";
   variables: Record<string, string>;
   activeScenarios: string[];
   turn: number;
   ended: boolean;
+  // How the conversation was started; finalization keeps it in feed metadata.
+  trigger?: RunTrigger;
   // Set once the AI disclosure guardrail has been satisfied.
   disclosedAi: boolean;
   handoff: boolean;
@@ -143,6 +164,7 @@ export type ConversationEvent =
   | DispositionEvent
   | JevEvent
   | StepEvent
+  | CallEvent
   | ConversationStateEvent
   | ConversationErrorEvent;
 

@@ -15,6 +15,7 @@ import {
   Loader2,
   MessageSquarePlus,
   Mic,
+  Phone,
   PhoneCall,
   Route,
   Search,
@@ -37,7 +38,22 @@ import { START_NODE_ID, type StartNode } from "./shared";
 
 const MAX_CONVERSATIONS = 25;
 
-type Tab = "chat" | "api";
+type Tab = "chat" | "phone" | "api";
+
+/** Client fetches carry the embed exampleId, like the page URLs do. */
+function withExampleId(path: string): string {
+  if (typeof window === "undefined") {
+    return path;
+  }
+
+  const exampleId = new URLSearchParams(window.location.search).get(
+    "exampleId"
+  );
+
+  return exampleId
+    ? `${path}${path.includes("?") ? "&" : "?"}exampleId=${encodeURIComponent(exampleId)}`
+    : path;
+}
 
 /* -------------------------------------------------------------------------- */
 /*                                   Helpers                                  */
@@ -344,6 +360,40 @@ function TranscriptRow({ event }: { event: ConversationEvent }) {
           ) : null}
         </div>
       );
+    case "call":
+      return (
+        <div className="flex items-start gap-1.5 px-0.5">
+          <PhoneCall className="mt-0.5 size-3 shrink-0 text-neutral-400" aria-hidden />
+          {event.status === "in-progress" ? (
+            <p className="text-[11px] leading-relaxed text-neutral-500">
+              {event.direction === "outbound" ? "Calling" : "Call from"}{" "}
+              <span className="font-mono text-neutral-700">
+                {event.direction === "outbound" ? event.to : event.from}
+              </span>{" "}
+              · live
+            </p>
+          ) : (
+            <div className="min-w-0">
+              <p className="text-[11px] leading-relaxed text-neutral-500">
+                Call {event.status === "failed" ? "failed" : "ended"}
+                {event.durationSeconds !== undefined
+                  ? ` · ${Math.floor(event.durationSeconds / 60)}:${String(
+                      event.durationSeconds % 60
+                    ).padStart(2, "0")}`
+                  : ""}
+                {event.disconnectionReason
+                  ? ` · ${event.disconnectionReason.replace(/_/g, " ")}`
+                  : ""}
+              </p>
+              {event.summary ? (
+                <p className="mt-0.5 text-[11px] italic leading-relaxed text-neutral-400">
+                  “{truncate(event.summary, 220)}”
+                </p>
+              ) : null}
+            </div>
+          )}
+        </div>
+      );
     case "error":
       return (
         <p className="rounded-lg bg-red-50 px-2 py-1.5 text-[11px] text-red-700">
@@ -520,8 +570,16 @@ function ConversationList() {
               >
                 <StatusIcon status={conversation.metadata.status} />
                 <span className="min-w-0 flex-1">
-                  <span className="block truncate text-[11px] font-medium text-neutral-800">
-                    {conversation.metadata.input || "(new conversation)"}
+                  <span className="flex min-w-0 items-center gap-1">
+                    {conversation.metadata.trigger === "call" ? (
+                      <PhoneCall
+                        className="size-2.5 shrink-0 text-violet-500"
+                        aria-hidden
+                      />
+                    ) : null}
+                    <span className="truncate text-[11px] font-medium text-neutral-800">
+                      {conversation.metadata.input || "(new conversation)"}
+                    </span>
                   </span>
                   <span className="mt-px block text-[10px] tabular-nums text-neutral-500">
                     {formatTime(Number(conversation.metadata.startedAt))}
@@ -805,6 +863,365 @@ function ChatTab({ agent }: { agent: AgentSummary }) {
 }
 
 /* -------------------------------------------------------------------------- */
+/*                                  Phone tab                                 */
+/* -------------------------------------------------------------------------- */
+
+type PhoneConnectionView = {
+  number: string;
+  transferNumber?: string;
+  mock?: boolean;
+};
+
+type PhoneStatus = {
+  connected: boolean;
+  connection?: PhoneConnectionView;
+  configured?: boolean;
+};
+
+type PlacedCall = {
+  callId: string;
+  conversationId: string;
+  mock: boolean;
+};
+
+function PhoneTab({
+  agent,
+  onOpenTranscript,
+}: {
+  agent: AgentSummary;
+  onOpenTranscript: () => void;
+}) {
+  const { selectConversation } = useConversation();
+  const [status, setStatus] = useState<PhoneStatus | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [busy, setBusy] = useState<"connect" | "disconnect" | "call" | null>(
+    null
+  );
+  const [transferNumber, setTransferNumber] = useState("");
+  const [toNumber, setToNumber] = useState("");
+  const [greeting, setGreeting] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [placed, setPlaced] = useState<PlacedCall | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    (async () => {
+      try {
+        const response = await fetch(
+          withExampleId(`/api/agents/${agent.agentId}/phone`)
+        );
+        const json = (await response.json()) as PhoneStatus;
+
+        if (!cancelled) {
+          setStatus(json);
+        }
+      } catch {
+        if (!cancelled) {
+          setStatus({ connected: false, configured: false });
+        }
+      } finally {
+        if (!cancelled) {
+          setIsLoading(false);
+        }
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [agent.agentId]);
+
+  async function postPhone(
+    body: Record<string, unknown>
+  ): Promise<Record<string, unknown>> {
+    const response = await fetch(
+      withExampleId(`/api/agents/${agent.agentId}/phone`),
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      }
+    );
+    const json = (await response.json()) as Record<string, unknown> & {
+      error?: string;
+    };
+
+    if (!response.ok) {
+      throw new Error(json.error ?? `Request failed (${response.status})`);
+    }
+
+    return json;
+  }
+
+  async function connect() {
+    setBusy("connect");
+    setError(null);
+
+    try {
+      const json = (await postPhone({
+        action: "connect",
+        webhookBaseUrl: window.location.origin,
+        ...(transferNumber.trim() !== ""
+          ? { transferNumber: transferNumber.trim() }
+          : {}),
+      })) as PhoneStatus;
+
+      setStatus((current) => ({
+        ...(current ?? { connected: false }),
+        connected: true,
+        connection: json.connection,
+        configured: json.configured,
+      }));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to connect");
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  async function disconnect() {
+    setBusy("disconnect");
+    setError(null);
+
+    try {
+      await postPhone({ action: "disconnect" });
+      setStatus((current) => ({
+        ...(current ?? {}),
+        connected: false,
+        connection: undefined,
+      }));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to disconnect");
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  async function placeCall() {
+    setBusy("call");
+    setError(null);
+
+    try {
+      const response = await fetch(
+        withExampleId(`/api/agents/${agent.agentId}/calls`),
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            toNumber: toNumber.trim(),
+            ...(greeting.trim() !== "" ? { greeting: greeting.trim() } : {}),
+          }),
+        }
+      );
+      const json = (await response.json()) as PlacedCall & { error?: string };
+
+      if (!response.ok || !json.conversationId) {
+        throw new Error(json.error ?? `Request failed (${response.status})`);
+      }
+
+      setPlaced(json);
+      selectConversation(json.conversationId);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to place call");
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  const connection = status?.connection;
+  const connected = status?.connected ?? false;
+  const canCall =
+    connected && toNumber.trim() !== "" && /^\+[1-9]\d{7,14}$/.test(toNumber.trim());
+
+  return (
+    <div className="runs-tab flex min-h-0 flex-1 flex-col">
+      <div className="run-composer border-b border-neutral-200/70 p-2.5">
+        <div className="mb-2.5 flex items-center gap-2">
+          <span className="flex size-6 shrink-0 items-center justify-center rounded-md bg-violet-50 text-violet-600">
+            <Phone className="size-3.5" aria-hidden />
+          </span>
+          <div>
+            <h2 className="text-[13px] font-semibold text-neutral-900">
+              Phone calls
+            </h2>
+            <p className="mt-0.5 text-[11px] text-neutral-500">
+              Attach a number via AgentPhone; every turn runs this agent&apos;s
+              graph.
+            </p>
+          </div>
+        </div>
+
+        {status?.configured === false ? (
+          <p className="mb-2 rounded-lg bg-amber-50 px-2 py-1.5 text-[11px] leading-relaxed text-amber-800">
+            No AGENTPHONE_API_KEY set — numbers and calls run in mock mode.
+            Conversations still run end to end.
+          </p>
+        ) : null}
+
+        {isLoading ? (
+          <p className="flex items-center gap-2 px-1 text-xs text-neutral-400">
+            <Loader2 className="size-3.5 animate-spin" /> Loading phone status…
+          </p>
+        ) : connected && connection ? (
+          <div className="rounded-lg border border-neutral-200 bg-neutral-50/70 px-2.5 py-2">
+            <div className="flex items-center gap-2">
+              <PhoneCall className="size-3.5 shrink-0 text-emerald-600" aria-hidden />
+              <span className="font-mono text-xs font-medium text-neutral-900">
+                {connection.number}
+              </span>
+              {connection.mock ? (
+                <span className="rounded bg-amber-50 px-1 text-[9px] font-medium text-amber-700">
+                  mock
+                </span>
+              ) : null}
+              <button
+                type="button"
+                onClick={() => void disconnect()}
+                disabled={busy !== null}
+                className="ml-auto inline-flex min-h-6 items-center gap-1 rounded-md px-1.5 text-[10px] font-medium text-neutral-500 hover:bg-neutral-100 hover:text-red-600"
+              >
+                Disconnect
+              </button>
+            </div>
+            {connection.transferNumber ? (
+              <p className="mt-1 text-[10px] text-neutral-500">
+                Handoffs transfer to{" "}
+                <span className="font-mono">{connection.transferNumber}</span>
+              </p>
+            ) : null}
+            <p className="mt-1 text-[10px] leading-relaxed text-neutral-400">
+              Inbound calls to this number are answered by this agent too.
+            </p>
+          </div>
+        ) : (
+          <div>
+            <label
+              htmlFor="phone-transfer-number"
+              className="mb-1 block text-[11px] font-medium text-neutral-600"
+            >
+              Transfer number for handoffs (optional)
+            </label>
+            <input
+              id="phone-transfer-number"
+              value={transferNumber}
+              onChange={(event) => setTransferNumber(event.target.value)}
+              placeholder="+15551234567"
+              className="workflow-field mb-1.5 block w-full rounded-md border border-neutral-200 bg-neutral-50/70 px-2 py-1.5 font-mono text-[11px] text-neutral-700 placeholder:text-neutral-400 focus:border-violet-400 focus:bg-white focus:outline-none"
+            />
+            <button
+              type="button"
+              onClick={() => void connect()}
+              disabled={busy !== null}
+              className="primary-button !min-h-7 !text-[11px]"
+            >
+              {busy === "connect" ? (
+                <Loader2 className="size-3.5 animate-spin" />
+              ) : (
+                <PhoneCall className="size-3.5" />
+              )}
+              {busy === "connect" ? "Connecting…" : "Connect phone number"}
+            </button>
+          </div>
+        )}
+
+        {error ? (
+          <p
+            role="alert"
+            className="mt-2 rounded-lg bg-red-50 px-3 py-2 text-xs leading-relaxed text-red-700"
+          >
+            {error}
+          </p>
+        ) : null}
+      </div>
+
+      {connected ? (
+        <div className="run-history min-h-0 flex-1 overflow-y-auto p-2.5">
+          <Section title="Dial out">
+            <label
+              htmlFor="call-to-number"
+              className="mb-1 block text-[11px] font-medium text-neutral-600"
+            >
+              Call
+            </label>
+            <input
+              id="call-to-number"
+              value={toNumber}
+              onChange={(event) => setToNumber(event.target.value)}
+              placeholder="+15559876543"
+              className="workflow-field mb-1.5 block w-full rounded-md border border-neutral-200 bg-neutral-50/70 px-2 py-1.5 font-mono text-[11px] text-neutral-700 placeholder:text-neutral-400 focus:border-violet-400 focus:bg-white focus:outline-none"
+            />
+            <label
+              htmlFor="call-greeting"
+              className="mb-1 block text-[11px] font-medium text-neutral-600"
+            >
+              Opening line (empty = generated from the agent&apos;s persona)
+            </label>
+            <textarea
+              id="call-greeting"
+              value={greeting}
+              rows={2}
+              placeholder="Hi, this is Dana from…"
+              onChange={(event) => setGreeting(event.target.value)}
+              className="workflow-field mb-1.5 block w-full resize-y rounded-md border border-neutral-200 bg-neutral-50/70 px-2 py-1.5 text-[11px] leading-5 text-neutral-700 placeholder:text-neutral-400 focus:border-violet-400 focus:bg-white focus:outline-none"
+            />
+            <button
+              type="button"
+              onClick={() => void placeCall()}
+              disabled={busy !== null || !canCall}
+              className="primary-button !min-h-7 !text-[11px]"
+            >
+              {busy === "call" ? (
+                <Loader2 className="size-3.5 animate-spin" />
+              ) : (
+                <PhoneCall className="size-3.5" />
+              )}
+              {busy === "call" ? "Placing call…" : "Place call"}
+            </button>
+
+            {placed ? (
+              <div className="mt-2 rounded-lg border border-violet-200 bg-violet-50/60 px-2.5 py-2">
+                <p className="text-[11px] leading-relaxed text-violet-800">
+                  Call placed{placed.mock ? " (mock — no real audio)" : ""}.
+                  The transcript streams into the conversation feed.
+                </p>
+                <button
+                  type="button"
+                  onClick={onOpenTranscript}
+                  className="mt-1 inline-flex min-h-6 items-center gap-1 rounded-md px-1.5 text-[11px] font-medium text-violet-700 hover:bg-violet-100"
+                >
+                  Watch it in the Chat tab
+                </button>
+              </div>
+            ) : null}
+          </Section>
+          <Section title="How calls run">
+            <p className="px-0.5 text-[11px] leading-relaxed text-neutral-500">
+              AgentPhone owns the audio: it transcribes each caller turn and
+              posts it to this app, which runs one full engine turn — Jev
+              routing, knowledge, tools, extraction — and replies with the text
+              to speak. Hangups and handoffs from the graph end or transfer the
+              call; when it ends, dispositions and end-of-call steps run over
+              the transcript like any test conversation.
+            </p>
+          </Section>
+        </div>
+      ) : (
+        <div className="run-history flex min-h-0 flex-1 items-center justify-center p-3">
+          <div className="panel-empty-state">
+            <Phone className="size-3.5 shrink-0 text-neutral-400" aria-hidden />
+            <p>
+              Connect a phone number to place and receive calls with this
+              agent.
+            </p>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
 /*                                   API tab                                  */
 /* -------------------------------------------------------------------------- */
 
@@ -826,6 +1243,12 @@ function ApiTab({ agent }: { agent: AgentSummary }) {
     `curl -X POST "${origin}/api/agents/${agent.agentId}/conversations/<conversationId>/messages" \\`,
     `  -H "Content-Type: application/json" \\`,
     `  -d '{"text": "We run about twelve trucks out of Elizabeth."}'`,
+  ].join("\n");
+
+  const callSnippet = [
+    `curl -X POST "${origin}/api/agents/${agent.agentId}/calls" \\`,
+    `  -H "Content-Type: application/json" \\`,
+    `  -d '{"toNumber": "+15559876543"}'`,
   ].join("\n");
 
   async function copy(key: string, snippet: string) {
@@ -853,6 +1276,7 @@ function ApiTab({ agent }: { agent: AgentSummary }) {
         [
           ["start", "Start a conversation", startSnippet],
           ["message", "Send a caller turn", messageSnippet],
+          ["call", "Place a phone call", callSnippet],
         ] as const
       ).map(([key, title, snippet]) => (
         <div
@@ -923,6 +1347,7 @@ export function AgentSidePanel({ agent }: { agent: AgentSummary }) {
         {(
           [
             ["chat", "Chat", <Mic key="chat" className="size-3" />],
+            ["phone", "Phone", <Phone key="phone" className="size-3" />],
             ["api", "API", <Terminal key="api" className="size-3.5" />],
           ] as const
         ).map(([id, label, icon]) => (
@@ -950,7 +1375,13 @@ export function AgentSidePanel({ agent }: { agent: AgentSummary }) {
           <ChevronRight className="size-4" />
         </button>
       </div>
-      {tab === "chat" ? <ChatTab agent={agent} /> : <ApiTab agent={agent} />}
+      {tab === "chat" ? (
+        <ChatTab agent={agent} />
+      ) : tab === "phone" ? (
+        <PhoneTab agent={agent} onOpenTranscript={() => setTab("chat")} />
+      ) : (
+        <ApiTab agent={agent} />
+      )}
     </aside>
   );
 }

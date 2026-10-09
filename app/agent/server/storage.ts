@@ -15,6 +15,10 @@ import {
   type AgentEdge,
   type AgentGraphNode,
 } from "../shared";
+import type { AgentPhoneConnection } from "./agentphone";
+
+/** Room metadata key holding the AgentPhone connection JSON. */
+export const AGENTPHONE_METADATA_KEY = "agentphone";
 
 export type AgentSummary = {
   agentId: string;
@@ -165,4 +169,45 @@ export async function readAgentGraph(roomId: string): Promise<{
   );
 
   return snapshot;
+}
+
+/* -------------------------------------------------------------------------- */
+/*                        AgentPhone connection (metadata)                     */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * The AgentPhone connection lives in room metadata (a JSON string) so both the
+ * server routes and the room's clients can see which number runs this agent.
+ */
+export async function getAgentPhoneConnection(
+  agentId: string,
+  exampleId: string | null | undefined
+): Promise<AgentPhoneConnection | null> {
+  try {
+    const room = await liveblocks.getRoom(getAgentRoomId(agentId, exampleId));
+    const raw = getMetadataString(
+      room.metadata[AGENTPHONE_METADATA_KEY] as string | string[] | undefined
+    );
+
+    if (raw === "") {
+      return null;
+    }
+
+    const connection = JSON.parse(raw) as AgentPhoneConnection;
+    return connection.agentId && connection.number ? connection : null;
+  } catch {
+    return null;
+  }
+}
+
+export async function setAgentPhoneConnection(
+  agentId: string,
+  exampleId: string | null | undefined,
+  connection: AgentPhoneConnection | null
+): Promise<void> {
+  await liveblocks.updateRoom(getAgentRoomId(agentId, exampleId), {
+    metadata: {
+      [AGENTPHONE_METADATA_KEY]: connection ? JSON.stringify(connection) : "",
+    },
+  });
 }

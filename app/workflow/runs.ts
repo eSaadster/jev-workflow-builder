@@ -20,7 +20,8 @@ export function getRunOutput(
 }
 
 export type RunStatus = "running" | "complete" | "error";
-export type RunTrigger = "test" | "api";
+// "call" marks conversations driven by a phone provider (AgentPhone).
+export type RunTrigger = "test" | "api" | "call";
 export type NodeStatus = "running" | "complete" | "error" | "skipped";
 
 export type ChoiceAnswer = {

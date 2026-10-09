@@ -303,6 +303,8 @@ Follows the established provider pattern (`BLAND_API_KEY` → real, else mock):
 
 Phase 1 alone already reproduces the core Bland loop (prompt → variables → tools → conversation) and is demoable keyless via existing mocks. The drayage use case maps cleanly at phase 2: the qualifier Jev questions become routing/disposition questions on a live call.
 
+> **Phase 4 shipped with AgentPhone instead of Bland** (see `app/agent/server/agentphone.ts`). AgentPhone's webhook mode keeps the whole brain in this app — no agent export — so the integration is thinner than the Bland plan in §5.7: a per-agent webhook route (`POST /api/agents/[agentId]/webhooks/agentphone`) maps each voice turn onto `processTurn` (conversation feed ids are derived as `conv-call-<callId>`), `POST /api/agents/[agentId]/calls` dials out with a persona-generated greeting as the initial greeting, `agent.call_ended` triggers finalization (dispositions + end-of-call steps), the `handoff` tool maps to `action: "transfer"`, and `end_conversation`/opt-out to `hangup`. A Phone tab in the side panel provisions the number (`POST /api/agents/[agentId]/phone`).
+
 ---
 
 ## 7. Key design decisions & trade-offs

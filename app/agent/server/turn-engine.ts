@@ -52,7 +52,7 @@ import {
   type AnswerValue,
   type QuestionDef,
 } from "../../workflow/shared";
-import type { Answer } from "../../workflow/runs";
+import type { Answer, RunTrigger } from "../../workflow/runs";
 import { createStartNode, createToolboxNode } from "../shared";
 
 const TURN_TIMEOUT_MS = 90_000;
@@ -260,11 +260,12 @@ async function updateEvent(
 /*                           Conversation snapshots                           */
 /* -------------------------------------------------------------------------- */
 
-function initialState(): ConversationStateEvent {
+function initialState(trigger?: RunTrigger): ConversationStateEvent {
   return {
     id: STATE_MESSAGE_ID,
     at: Date.now(),
     kind: "state",
+    ...(trigger ? { trigger } : {}),
     variables: {},
     activeScenarios: [],
     turn: 0,
@@ -282,6 +283,16 @@ async function loadConversation(
   roomId: string,
   conversationId: string
 ): Promise<{ events: ConversationEvent[]; state: ConversationStateEvent } | null> {
+  // getFeedMessages returns an empty list for a missing feed, so probe the
+  // feed itself (404) first — otherwise a nonexistent conversation looks like
+  // an empty one and a turn would run with every write silently dropped.
+  try {
+    await liveblocks.getFeed({ roomId, feedId: conversationId });
+  } catch (error) {
+    console.error("Conversation read failed", error);
+    return null;
+  }
+
   let data: unknown;
 
   try {
@@ -344,8 +355,21 @@ function transcriptTail(
 export async function startConversation(options: {
   roomId: string;
   opening?: string;
-}): Promise<{ conversationId: string }> {
-  const conversationId = `conv-${nanoid(10)}`;
+  // Overrides the generated feed id; phone calls pass conv-call-<callId> so
+  // webhook deliveries map back without a registry.
+  conversationId?: string;
+  // Pre-written agent first line, seeded without running a turn (a phone
+  // provider has already spoken it via TTS as the call's initial greeting).
+  greeting?: string;
+  // How the conversation was started (feed metadata); finalization keeps it.
+  trigger?: RunTrigger;
+  // Display string for the conversation list; defaults to the opening.
+  input?: string;
+  // Events written below the state message before the first turn (e.g. the
+  // in-progress call event for phone conversations).
+  seedEvents?: ConversationEvent[];
+}): Promise<{ conversationId: string; reply: string }> {
+  const conversationId = options.conversationId ?? `conv-${nanoid(10)}`;
   const opening = options.opening?.trim() ?? "";
 
   await safe(() =>
@@ -354,8 +378,8 @@ export async function startConversation(options: {
       feedId: conversationId,
       metadata: {
         status: "running",
-        trigger: "test",
-        input: truncate(opening || "(new conversation)", 200),
+        trigger: options.trigger ?? "test",
+        input: truncate(options.input ?? (opening || "(new conversation)"), 200),
         startedAt: String(Date.now()),
       },
     })
@@ -366,24 +390,59 @@ export async function startConversation(options: {
       roomId: options.roomId,
       feedId: conversationId,
       id: STATE_MESSAGE_ID,
-      data: initialState() as never,
+      data: initialState(options.trigger) as never,
     })
   );
 
-  // An opening caller message runs a full first turn; without one the agent
-  // speaks first (its greeting).
-  await processTurn({
+  for (const event of options.seedEvents ?? []) {
+    await writeEvent(options.roomId, conversationId, event);
+  }
+
+  // A greeting seeds the agent's first line without a model call; an opening
+  // caller message runs a full first turn; without either the agent speaks
+  // first (its greeting).
+  if (options.greeting !== undefined) {
+    const greeting = options.greeting.trim();
+
+    if (greeting !== "") {
+      await writeEvent(options.roomId, conversationId, {
+        id: `agent-${nanoid(8)}`,
+        at: Date.now(),
+        kind: "agent",
+        text: greeting,
+      });
+    }
+
+    return { conversationId, reply: greeting };
+  }
+
+  const result = await processTurn({
     roomId: options.roomId,
     conversationId,
     text: opening || null,
   });
 
-  return { conversationId };
+  return { conversationId, reply: result.reply };
+}
+
+/**
+ * Appends one event to an existing conversation feed (used by phone-provider
+ * routes to record call bookkeeping alongside the transcript).
+ */
+export async function appendConversationEvent(options: {
+  roomId: string;
+  conversationId: string;
+  event: ConversationEvent;
+}): Promise<void> {
+  await writeEvent(options.roomId, options.conversationId, options.event);
 }
 
 export type TurnResult = {
   reply: string;
   ended: boolean;
+  // The handoff tool fired this turn (or earlier): a phone provider should
+  // cold-transfer the call instead of replying further.
+  handoff: boolean;
   error?: string;
 };
 
@@ -422,19 +481,29 @@ async function runTurn(
   const config = await loadAgentConfig(roomId);
 
   if (!config) {
-    return { reply: "", ended: false, error: "This agent has no agent node." };
+    return {
+      reply: "",
+      ended: false,
+      handoff: false,
+      error: "This agent has no agent node.",
+    };
   }
 
   const snapshot = await loadConversation(roomId, conversationId);
 
   if (!snapshot) {
-    return { reply: "", ended: false, error: "Conversation not found." };
+    return {
+      reply: "",
+      ended: false,
+      handoff: false,
+      error: "Conversation not found.",
+    };
   }
 
   const state = snapshot.state;
 
   if (state.ended) {
-    return { reply: "", ended: true };
+    return { reply: "", ended: true, handoff: state.handoff };
   }
 
   const text = options.text?.trim() ?? "";
@@ -445,7 +514,7 @@ async function runTurn(
       ...state,
       turn,
     });
-    return { reply: "", ended: true };
+    return { reply: "", ended: true, handoff: state.handoff };
   }
 
   if (turn > MAX_TURNS) {
@@ -453,7 +522,12 @@ async function runTurn(
       ...state,
       turn,
     });
-    return { reply: "", ended: true, error: `Conversation hit the ${MAX_TURNS}-turn limit.` };
+    return {
+      reply: "",
+      ended: true,
+      handoff: state.handoff,
+      error: `Conversation hit the ${MAX_TURNS}-turn limit.`,
+    };
   }
 
   const variables: Record<string, string> = { ...state.variables };
@@ -722,6 +796,7 @@ async function runTurn(
       return {
         reply: "Understood — I'll let you go. Sorry for the trouble, and I won't call again.",
         ended: true,
+        handoff: false,
       };
     }
 
@@ -933,7 +1008,94 @@ async function runTurn(
     await updateEvent(roomId, conversationId, STATE_MESSAGE_ID, nextState);
   }
 
-  return { reply: result.text, ended };
+  return { reply: result.text, ended, handoff: handoff || state.handoff };
+}
+
+/**
+ * Finalizes a conversation from outside the turn loop — e.g. the caller hung
+ * up: runs dispositions and end-of-call steps over the transcript. No-op when
+ * the conversation is already finalized or missing.
+ */
+export async function endConversation(options: {
+  roomId: string;
+  conversationId: string;
+}): Promise<{ ended: boolean; error?: string }> {
+  const config = await loadAgentConfig(options.roomId);
+
+  if (!config) {
+    return { ended: false, error: "This agent has no agent node." };
+  }
+
+  const snapshot = await loadConversation(
+    options.roomId,
+    options.conversationId
+  );
+
+  if (!snapshot) {
+    return { ended: false, error: "Conversation not found." };
+  }
+
+  if (snapshot.state.ended) {
+    return { ended: true };
+  }
+
+  await finalizeConversation(
+    options.roomId,
+    options.conversationId,
+    config,
+    snapshot.events,
+    snapshot.state
+  );
+
+  return { ended: true };
+}
+
+/**
+ * One-off opening line for outbound calls: the same persona prompt the turn
+ * engine composes, without scenarios, knowledge or tools. Generated before the
+ * call is placed so the phone provider can speak it as the initial greeting.
+ */
+export async function generateGreeting(options: {
+  roomId: string;
+}): Promise<{ text: string; mock: boolean }> {
+  const config = await loadAgentConfig(options.roomId);
+
+  if (!config) {
+    return { text: "Hello?", mock: true };
+  }
+
+  const variables: Record<string, string> = {};
+
+  for (const entry of config.start.requestData) {
+    if (entry.key.trim() !== "") {
+      variables[entry.key.trim()] = entry.value;
+    }
+  }
+
+  const system = composeSystemPrompt({
+    config,
+    activeScenarios: [],
+    variables,
+    knowledge: "",
+    discloseAi:
+      config.agent.guardrails.aiDisclosure.enabled,
+  });
+
+  const result = await runConversationTurn({
+    system,
+    messages: [
+      {
+        role: "user",
+        content:
+          "(The call just connected and the caller is listening. Say your opening line now: introduce yourself and say why you are calling, in one or two short spoken sentences.)",
+      },
+    ],
+    model: config.agent.model,
+    sessionId: `greeting-${nanoid(6)}`,
+    onChunk: () => {},
+  });
+
+  return { text: result.text.trim(), mock: result.mock };
 }
 
 async function writeGuardrails(
@@ -1514,7 +1676,7 @@ async function finalizeConversation(
       feedId: conversationId,
       metadata: {
         status: "complete",
-        trigger: "test",
+        trigger: state.trigger ?? "test",
         input: truncate(tail.split("\n")[0] || "(conversation)", 200),
         startedAt: String(events[0]?.at ?? Date.now()),
         completedAt: String(Date.now()),

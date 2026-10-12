@@ -1,6 +1,6 @@
 "use client";
 
-import { useDeleteFeed, useFeeds, useOthers } from "@liveblocks/react";
+import { useDeleteFeed, useFeedMessages, useFeeds, useOthers } from "@liveblocks/react";
 import { useNodesData } from "@xyflow/react";
 import {
   AlertCircle,
@@ -24,6 +24,7 @@ import {
   Sparkles,
   Terminal,
   Trash2,
+  Wand2,
   Wrench,
   X,
 } from "lucide-react";
@@ -32,13 +33,13 @@ import type { Answer } from "../workflow/runs";
 import type { RunStatus } from "../workflow/runs";
 import { truncate } from "../workflow/shared";
 import { useConversation } from "./conversation-context";
-import type { ConversationEvent } from "./conversation";
+import { isConversationEvent, type ConversationEvent } from "./conversation";
 import type { AgentSummary } from "./server/storage";
 import { START_NODE_ID, type StartNode } from "./shared";
 
 const MAX_CONVERSATIONS = 25;
 
-type Tab = "chat" | "phone" | "api";
+type Tab = "chat" | "phone" | "copilot" | "api";
 
 /** Client fetches carry the embed exampleId, like the page URLs do. */
 function withExampleId(path: string): string {
@@ -491,6 +492,8 @@ function ConversationList() {
   const conversations = useMemo(
     () =>
       [...(feeds ?? [])]
+        // Copilot chats are builder sessions, not caller conversations.
+        .filter((conversation) => conversation.metadata.trigger !== "copilot")
         .sort(
           (a, b) =>
             Number(b.metadata.startedAt) - Number(a.metadata.startedAt)
@@ -1222,6 +1225,308 @@ function PhoneTab({
 }
 
 /* -------------------------------------------------------------------------- */
+/*                                Copilot tab                                 */
+/* -------------------------------------------------------------------------- */
+
+function CopilotFeedLoader({
+  conversationId,
+  onEvents,
+  onLoading,
+}: {
+  conversationId: string;
+  onEvents: (events: readonly ConversationEvent[]) => void;
+  onLoading: (isLoading: boolean) => void;
+}) {
+  const result = useFeedMessages(conversationId);
+
+  useEffect(() => {
+    onLoading(result.isLoading);
+  }, [result.isLoading, onLoading]);
+
+  useEffect(() => {
+    if (result.messages) {
+      onEvents(
+        result.messages
+          .map((message) => (message as { data?: unknown }).data)
+          .filter(isConversationEvent)
+          .sort((a, b) => a.at - b.at || a.id.localeCompare(b.id))
+      );
+    }
+  }, [result.messages, onEvents]);
+
+  return null;
+}
+
+function CopilotTab({ agent }: { agent: AgentSummary }) {
+  const { feeds, isLoading } = useFeeds();
+  const deleteFeed = useDeleteFeed();
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [events, setEvents] = useState<readonly ConversationEvent[]>([]);
+  const [isFeedLoading, setFeedLoading] = useState(false);
+  const [message, setMessage] = useState("");
+  const [isSending, setSending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const bottomRef = useRef<HTMLDivElement>(null);
+
+  const sessions = useMemo(
+    () =>
+      [...(feeds ?? [])]
+        .filter((feed) => feed.metadata.trigger === "copilot")
+        .sort((a, b) => Number(b.metadata.startedAt) - Number(a.metadata.startedAt)),
+    [feeds]
+  );
+
+  // Returning to the tab (or reloading) reopens the most recent chat, so a
+  // mid-flow navigation doesn't look like the history disappeared.
+  const didAutoSelect = useRef(false);
+
+  useEffect(() => {
+    if (!didAutoSelect.current && sessions.length > 0) {
+      didAutoSelect.current = true;
+
+      if (selectedId === null || !sessions.some((s) => s.feedId === selectedId)) {
+        setSelectedId(sessions[0].feedId);
+      }
+    }
+  }, [sessions, selectedId]);
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ block: "end" });
+  }, [events]);
+
+  async function send() {
+    const text = message.trim();
+
+    if (text === "" || isSending) {
+      return;
+    }
+
+    setSending(true);
+    setError(null);
+    setMessage("");
+
+    try {
+      const response = await fetch(
+        withExampleId(`/api/agents/${agent.agentId}/copilot`),
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(
+            selectedId ? { conversationId: selectedId, text } : { text }
+          ),
+        }
+      );
+      const json = (await response.json()) as {
+        conversationId?: string;
+        error?: string;
+      };
+
+      if (!response.ok || !json.conversationId) {
+        throw new Error(json.error ?? `Request failed (${response.status})`);
+      }
+
+      setSelectedId(json.conversationId);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to send");
+    } finally {
+      setSending(false);
+    }
+  }
+
+  async function deleteSession(feedId: string) {
+    if (selectedId === feedId) {
+      setSelectedId(null);
+      setEvents([]);
+    }
+
+    try {
+      await deleteFeed(feedId);
+    } catch {
+      setError("Couldn't delete this chat. Try again.");
+    }
+  }
+
+  // Only the latest event counts as activity: stale running/empty events from
+  // an interrupted turn would otherwise spin the composer forever.
+  const lastEvent = [...events]
+    .filter((event) => event.kind !== "state")
+    .at(-1);
+
+  const isThinking =
+    isSending ||
+    (lastEvent?.kind === "agent" && lastEvent.text === "") ||
+    (lastEvent?.kind === "tool" && lastEvent.status === "running");
+
+  return (
+    <div className="runs-tab flex min-h-0 flex-1 flex-col">
+      <div className="run-composer border-b border-neutral-200/70 p-2.5">
+        <div className="flex items-center gap-2">
+          <span className="flex size-6 shrink-0 items-center justify-center rounded-md bg-sky-50 text-sky-600">
+            <Wand2 className="size-3.5" aria-hidden />
+          </span>
+          <div className="min-w-0 flex-1">
+            <h2 className="text-[13px] font-semibold text-neutral-900">
+              Build copilot
+            </h2>
+            <p className="mt-0.5 text-[11px] text-neutral-500">
+              Describe the agent — it edits the graph live and tests it.
+            </p>
+          </div>
+          {selectedId ? (
+            <button
+              type="button"
+              onClick={() => {
+                setSelectedId(null);
+                setEvents([]);
+              }}
+              className="shrink-0 rounded-md px-2 py-1 text-[10px] font-medium text-neutral-500 hover:bg-neutral-100 hover:text-neutral-900"
+            >
+              New chat
+            </button>
+          ) : null}
+        </div>
+        {error ? (
+          <p
+            role="alert"
+            className="mt-2 rounded-lg bg-red-50 px-3 py-2 text-xs leading-relaxed text-red-700"
+          >
+            {error}
+          </p>
+        ) : null}
+      </div>
+
+      <div className="run-history min-h-0 flex-1 overflow-y-auto p-2.5">
+        <Section title="Copilot chats">
+          {isLoading ? (
+            <p className="flex items-center gap-2 px-1 text-xs text-neutral-400">
+              <Loader2 className="size-3.5 animate-spin" /> Loading chats…
+            </p>
+          ) : sessions.length === 0 ? (
+            <div className="panel-empty-state">
+              <Wand2 className="size-3.5 shrink-0 text-neutral-400" aria-hidden />
+              <p>No copilot chats yet.</p>
+            </div>
+          ) : (
+            <ul className="flex flex-col gap-1">
+              {sessions.map((session) => {
+                const selected = session.feedId === selectedId;
+
+                return (
+                  <li
+                    key={session.feedId}
+                    className={`run-list-item flex items-center rounded-md border ${
+                      selected
+                        ? "border-sky-200 bg-sky-50/70"
+                        : "border-transparent hover:border-neutral-200 hover:bg-white"
+                    }`}
+                  >
+                    <button
+                      type="button"
+                      onClick={() => setSelectedId(selected ? null : session.feedId)}
+                      aria-pressed={selected}
+                      className="flex min-w-0 flex-1 items-center gap-2.5 rounded-md px-2 py-1 text-left"
+                    >
+                      <StatusIcon status={session.metadata.status} />
+                      <span className="min-w-0 flex-1">
+                        <span className="block truncate text-[11px] font-medium text-neutral-800">
+                          {session.metadata.input || "(new chat)"}
+                        </span>
+                        <span className="mt-px block text-[10px] tabular-nums text-neutral-500">
+                          {formatTime(Number(session.metadata.startedAt))}
+                        </span>
+                      </span>
+                    </button>
+                    <button
+                      type="button"
+                      className="icon-button run-delete-button mr-1 shrink-0"
+                      onClick={() => void deleteSession(session.feedId)}
+                      aria-label="Delete copilot chat"
+                      title="Delete copilot chat"
+                    >
+                      <Trash2 className="size-3" aria-hidden />
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </Section>
+
+        <Section title="Transcript">
+          {selectedId ? (
+            isFeedLoading && events.length === 0 ? (
+              <p className="flex items-center gap-2 px-1 text-xs text-neutral-400">
+                <Loader2 className="size-3.5 animate-spin" /> Loading chat…
+              </p>
+            ) : (
+              <div className="flex flex-col gap-2">
+                {events
+                  .filter((event) => event.kind !== "state")
+                  .map((event) => (
+                    <TranscriptRow key={event.id} event={event} />
+                  ))}
+                <div ref={bottomRef} />
+              </div>
+            )
+          ) : (
+            <p className="px-0.5 text-[11px] leading-relaxed text-neutral-500">
+              Ask for anything you&apos;d otherwise build by hand: “add a
+              callback-request scenario and wire a Jev question into it”, “give
+              the agent a lookup tool for FMCSA data”, “test the qualification
+              flow as a skeptical dispatcher”. Every edit appears on the canvas
+              as it happens.
+            </p>
+          )}
+        </Section>
+      </div>
+
+      <div className="conversation-composer flex items-end gap-1.5 border-t border-neutral-200/70 p-2">
+        <textarea
+          aria-label="Message the build copilot"
+          value={message}
+          rows={2}
+          placeholder={
+            selectedId ? "Continue building…" : "Describe what to build…"
+          }
+          disabled={isSending}
+          onChange={(event) => setMessage(event.target.value)}
+          onKeyDown={(event) => {
+            if (event.key === "Enter" && !event.shiftKey) {
+              event.preventDefault();
+              void send();
+            }
+          }}
+          className="workflow-field block min-h-0 flex-1 resize-none rounded-md border border-neutral-200 bg-neutral-50/70 px-2 py-1.5 text-xs leading-5 text-neutral-700 placeholder:text-neutral-400 focus:border-sky-400 focus:bg-white focus:outline-none disabled:opacity-60"
+        />
+        <button
+          type="button"
+          onClick={() => void send()}
+          disabled={isSending || message.trim() === ""}
+          title="Send to the copilot"
+          aria-label="Send to the copilot"
+          className="primary-button !min-h-8 !px-2.5"
+        >
+          {isThinking ? (
+            <Loader2 className="size-3.5 animate-spin" />
+          ) : (
+            <Send className="size-3.5" />
+          )}
+        </button>
+      </div>
+
+      {selectedId ? (
+        <CopilotFeedLoader
+          key={selectedId}
+          conversationId={selectedId}
+          onEvents={setEvents}
+          onLoading={setFeedLoading}
+        />
+      ) : null}
+    </div>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
 /*                                   API tab                                  */
 /* -------------------------------------------------------------------------- */
 
@@ -1348,6 +1653,7 @@ export function AgentSidePanel({ agent }: { agent: AgentSummary }) {
           [
             ["chat", "Chat", <Mic key="chat" className="size-3" />],
             ["phone", "Phone", <Phone key="phone" className="size-3" />],
+            ["copilot", "Copilot", <Wand2 key="copilot" className="size-3" />],
             ["api", "API", <Terminal key="api" className="size-3.5" />],
           ] as const
         ).map(([id, label, icon]) => (
@@ -1379,6 +1685,8 @@ export function AgentSidePanel({ agent }: { agent: AgentSummary }) {
         <ChatTab agent={agent} />
       ) : tab === "phone" ? (
         <PhoneTab agent={agent} onOpenTranscript={() => setTab("chat")} />
+      ) : tab === "copilot" ? (
+        <CopilotTab agent={agent} />
       ) : (
         <ApiTab agent={agent} />
       )}
